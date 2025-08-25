@@ -46,10 +46,7 @@ class FormattedConversation():
         
         #self.conversation = conversation
 
-    def match_phrase(self,keywords,country=None):
-        if country:
-            if self.country != country:
-                return False
+    def match_phrase(self,keywords):
         for turn in self.clean_conv.values():
             if turn["role"] == "user":
                 roleplay_template = [r"pretend to be (my|him|her|them|someone)",r"role( |-?)play as (my|him|her|them|someone)",r"(respond|talk|act|behave) (to me )*(like|as if) you( [a-z]+|')?re (my|him|her|them|someone)",r"(respond|talk|act|behave) (to me )*(like|as) (my|him|her|them|someone)"]
@@ -78,9 +75,9 @@ def search_ds(output,country,keywords,limit=None):
             if output.language != "English":
                 continue 
             if country != "none":
-                match = output.match_phrase(keywords,country)
-            else:
-                match = output.match_phrase(keywords)      
+                if output.country != country:
+                    continue
+            match = output.match_phrase(keywords)      
             if match:
                 t0 = timer()
                 turns = [(x["role"], x["content"]) for x in output.clean_conv.values()]
