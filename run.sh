@@ -6,23 +6,17 @@
 
 export HF_TOKEN="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"
 
-source .wildchat/bin/activate
+export TOKENIZERS_PARALLELISM=false
 
-if [ $5 = "promptgen" ]
-then 
-python3 src/prep_phrases.py $1
-else 
-    if test -f ./{$1}prompts.txt; then
-    echo "Prompts found"
-    else 
-    python3 src/prep_phrases.py $1
-    fi
-fi 
 
-if [ -z "$4" ]
-then 
-python3 src/search_dataset.py --task $1 --country $2 -of $3 
+source .new_wildchat/bin/activate
 
-else
-python3 src/search_dataset.py --task $1 --country $2 -of $3 --limit $4 
-fi 
+python3 src/search_dataset.py \
+    --task $1 \
+    -of $2 \
+    --usecase $3 \
+    --limit $4 \
+    --dataset $5 \
+    $6
+    #--country $7 \
+
