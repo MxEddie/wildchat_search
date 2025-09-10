@@ -7,9 +7,8 @@ from collections import defaultdict
 import re
 from timeit import default_timer as timer
 import pandas as pd
-from transformers import pipeline
+from transformers import pipeline, AutoModelForCausalLM, AutoTokenizer
 from transformers.pipelines.pt_utils import KeyDataset
-from transformers import AutoModelForCausalLM, AutoTokenizer
 import gc
 import json
 
@@ -30,6 +29,7 @@ parser.add_argument("--limit",help="maximum number of instances you want to take
 parser.add_argument("--usecase",help="use case determines whether you are looking for roleplay and advice, or a test",default="both")
 parser.add_argument("--dataset",help="which dataset to use",default="wildchat")
 parser.add_argument("--from_file",action='store_true', help="whether to load conversations from a file rather than the dataset",default=False)
+parser.add_argument("--match_only",help="whether to only search for phrases and not run through the model",default=True)
 args = parser.parse_args()
 
 # Define classes 
@@ -42,11 +42,13 @@ class FormattedConversation():
             self.language = example["conversation"][0]["language"]
             self.country = example["conversation"][0]["country"]
             self.id = example["conversation_hash"]
+            self.ip = example["hashed_ip"]
 
         elif dataset == "lmsys-chat":
             self.language = example["language"]
             self.country = "none"
             self.id = example["conversation_id"]
+            self.ip = "none"    
 
         self.model = example["model"]
         self.identity_flag = False
@@ -137,7 +139,7 @@ def search_ds(country,templates,keywords,task,limit,datasetname="wildchat"):
     else:
         dataset = load_dataset(name,"default",split="train",streaming=True)
 
-    keep_df = pd.DataFrame(columns=["Conversation ID","Conversation","UseCase","Model"])
+    keep_df = pd.DataFrame(columns=["Conversation ID","Conversation","UseCase","Model","Hashed IP"])
 
     for i,example in enumerate(tqdm(dataset)):
         output = FormattedConversation(example,datasetname)
@@ -149,10 +151,10 @@ def search_ds(country,templates,keywords,task,limit,datasetname="wildchat"):
                 continue
         match = output.match_phrase(templates,keywords,task)      
         if match:
-            keep_df.loc[len(keep_df)] = [output.id, output.conversation, match[0][1], output.model]
+            keep_df.loc[len(keep_df)] = [output.id, output.conversation, match[0][1], output.model, output.ip]
 
     print(f"{keep_df.shape[0]} conversations matched phrases and templates")
-    keep_df.to_csv(f"/home/eddie/matched_{task}_{datasetname}_test.csv",index=False)
+    keep_df.to_csv(f"../matched_{task}_{datasetname}.csv",index=False)
 
     return keep_df    
 
@@ -160,8 +162,8 @@ def search_ds(country,templates,keywords,task,limit,datasetname="wildchat"):
 def analyse_responses(keep_df, pipe, output):
     '''Function which takes a dataframe of conversations, runs them through the model pipeline and writes accepted conversations to a file'''
     dataset = Dataset.from_pandas(keep_df)
-    with open(f"/home/eddie/{output}","w") as f:
-        f.write("Conversation ID\tContent\tUseCase\tModel\n")
+    with open(f"../{output}","w") as f:
+        f.write("Conversation ID\tContent\tUseCase\tModel\tIP Address\n")
         rejection_list = []
         check_list = []
         content = pipe(KeyDataset(dataset, "Prompt"), max_new_tokens=3)
@@ -170,11 +172,11 @@ def analyse_responses(keep_df, pipe, output):
             if re.search(r"no",decision.lower()):
                 rejection_list.append(keep_df.loc[idx]['Conversation ID'])
             elif re.search(r"yes",decision.lower()):            
-                f.write(f"{keep_df.loc[idx]['Conversation ID']}\t{keep_df.loc[idx]['Conversation']}\t{keep_df.loc[idx]['UseCase']}\t{keep_df.loc[idx]['Model']}\n")
+                f.write(f"{keep_df.loc[idx]['Conversation ID']}\t{keep_df.loc[idx]['Conversation']}\t{keep_df.loc[idx]['UseCase']}\t{keep_df.loc[idx]['Model']}\t{keep_df.loc[idx]['Hashed IP']}\n")
             else:
                 check_list.append(keep_df.loc[idx]['Conversation ID'])
 
-    with open(f"/home/eddie/rejected_{output}","w") as f:
+    with open(f"../rejected_{output}","w") as f:
         f.write(f"{len(rejection_list)} conversations rejected\n")
         for conv_id in rejection_list:
             f.write(f"{conv_id}\n")
@@ -232,22 +234,22 @@ def main(args):
 
     if args.from_file:
         print("loading conversations from file")
-        keep_df = pd.read_csv(f"/home/eddie/matched_{args.task}_{args.dataset}.csv")
+        keep_df = pd.read_csv(f"../matched_{args.task}_{args.dataset}.csv")
         print(f"{keep_df.shape[0]} conversations loaded from file")
     else:
         keep_df = search_ds(country,templates,key_words,task=args.task,limit=args.limit,datasetname=args.dataset)
-
+    
+    if args.match_only == "True":
+        print("match only flag set, exiting after matching")
+        return
+ 
+    # Truncate overly long conversations
     for i, row in keep_df.iterrows():
         if len(row["Conversation"]) > 15000:
             print(f"Conversation {row['Conversation ID']} too long, truncating")
             keep_df.at[i, "Conversation"] = row["Conversation"][:15000]
 
-    keep_df["Prompt"] = keep_df["Conversation"].apply(full_prompt,task=args.task)
-
-    # filter out overly long conversations
-    #keep_df = keep_df[keep_df['Conversation'].str.len() < 20000]
-    #keep_df.reset_index(drop=True,inplace=True)
-    #print(f"{keep_df.shape[0]} conversations after filtering for length")
+    keep_df["Prompt"] = keep_df["Conversation"].apply(full_prompt,task=args.task) #Create full prompts for each conversation
 
     # Set up model and tokenizer
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

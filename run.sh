@@ -4,12 +4,11 @@
 #SBATCH --gres=gpu:1  # use 1 GPU
 #SBATCH -t 4:00:00  # time requested in hour:minute:seconds
 
-export HF_TOKEN="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"
+export HF_TOKEN="" #huggingface token
 
 export TOKENIZERS_PARALLELISM=false
 
-
-source .new_wildchat/bin/activate
+source .venv/bin/activate #activate the virtual environment
 
 python3 src/search_dataset.py \
     --task $1 \
@@ -17,6 +16,7 @@ python3 src/search_dataset.py \
     --usecase $3 \
     --limit $4 \
     --dataset $5 \
-    $6
+    --match_only $6 \
+    $7 
     #--country $7 \
 
