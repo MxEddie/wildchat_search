@@ -157,6 +157,9 @@ def main(args):
     else:
         keep_df = search_ds(country,templates,limit=args.limit,datasetname=args.dataset)
     
+    print(keep_df["Relationship"].value_counts())
+    print(keep_df["Break up"].value_counts())
+    print(keep_df["IPV"].value_counts())
     
     print("match only flag set, exiting after matching")
     return
