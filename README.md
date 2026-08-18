@@ -1,6 +1,6 @@
 A simple python script to search Huggingface datasets for mentions of seeking support around major social transitions.
 
-**You must be granted access to lmsys/lmsys-chat-1m and apply for permission to access allenai/WildChat-4.8M-Full in order to search these datasets **
+**You must be granted access to lmsys/lmsys-chat-1m and apply for permission to access allenai/WildChat-4.8M-Full in order to search these datasets**
 
 
 Uses regex to match key phrases related to seeking advice, or social roleplay.
