@@ -32,7 +32,7 @@ parser.add_argument("--load_output",action='store_true', help="whether to load c
 
 ## Define classes 
 
-class FormattedConversation():
+class FormattedConversation:
     ''' Class which takes a raw conversation from the dataset and reformats it for searching, with each turn within the conversation cleaned of newlines, tabs and quotes. Also stores the conversation ID, model, language, country and hashed IP if available'''
     def __init__(self,example,dataset):
 
