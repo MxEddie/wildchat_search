@@ -47,7 +47,7 @@ AP4L_TEMPLATES = {
     "set_B": ["breakup", "queer", "comeout"]
 }
 
-AIPV_TEMPLATES = {
+TEST_AIPV_TEMPLATES = {
     "templates": {
         "IPV": [
             r"IPV",r"abuse",r"violen(t|ce)",r"toxic",r"control[a-z]* me", "is ([a-z]+ )controlling",r"manipulat[a-z]*",r"abuse",r"isolat[a-z]+",r"threat[a-z]*",r"intimidat[a-z]+",r"stalk[a-z]*",r"harass[a-z]*",r"jealous[a-z]*",r"blam[a-z]*",r"put[a-z]* (me|you) down",r"mak[a-z]* (me|you) feel (stupid|worthless|scared)",r"check[a-z]* (my|your) (phone|emails|texts|messages|facebook|insta(gram)|IG|snap(chat)?)",r"accus[a-z]* (me|you) of cheating",r"force[a-z]* (me|you) to"],
@@ -55,5 +55,21 @@ AIPV_TEMPLATES = {
                 r"relationship",r"\b[a-z]friend",r"bf",r"gf",r"partner",r"wife",r"husband",r"my SO\b",r"dating",r"marriage",r"married",r"fiance(e|é)+",r"engaged",r"spouse",r"significant other",r"my (wo)?man",r"my girl",r"hubby",r"my ex\b"
             ]}, 
     "set_A": ["IPV"],
+    "set_B": ["relationship"]
+}
+
+AIPV_TEMPLATES = {
+    "templates": {
+        "control": [
+            r"control[a-z]* (((the|my|our) (money|bank account))|(my (appearance|looks|diet|outfit)))"
+        ],
+        "surveillance": [
+            r"(constantly|always) check[a-z]* where I (am|was)",
+        ],
+        "relationship": 
+        [
+                r"relationship",r"\b[a-z]friend",r"bf",r"gf",r"partner",r"wife",r"husband",r"my SO\b",r"dating",r"marriage",r"married",r"fiance(e|é)+",r"engaged",r"spouse",r"significant other",r"my (wo)?man",r"my girl",r"hubby",r"my ex\b"
+            ]},
+    "set_A": ["control", "surveillance"],
     "set_B": ["relationship"]
 }

@@ -5,6 +5,13 @@ A simple python script to search Huggingface datasets for mentions of seeking su
 
 Uses regex to match key phrases related to different categories (stored in templates.py)
 
+# WIP
+
+## To do
+
+    - [ ] Don't run evaluate on empty file
+    - [ ] Decide how best to handle long conversation turns (skip, truncate?)
+
 #### To search dataset 
 
     python search_dataset 

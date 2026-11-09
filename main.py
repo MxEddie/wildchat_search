@@ -53,11 +53,7 @@ def load_env_config():
     logger.info(f"Loaded public environment variables from .env.public: {dotenv_values('.env.public')}")
     load_dotenv(".env.private")  # Load sensitive variables into environment
     logger.info("Loaded private environment variables from .env.private") ## do not log! 
-    config = {
-    **dotenv_values(".env.public"),  # store shared development variables to a dictionary
-    **dotenv_values(".env.private"),  # store sensitive variables to a dictionary
-    }
-    return config
+
 
 
 def search_ds(country:str, template_info:dict, data_limit:int=None, datasetname: str="wildchat",turn_len_limit:int=None, output_file:str=None) -> pd.DataFrame:
@@ -113,7 +109,7 @@ def evaluate_conversations(conversations: dict) -> dict:
     output_count=1
     model = EvaluateModel(model=model_name, hf_access_token=os.environ.get("HF_TOKEN"), retry_attempts=3)
 
-    system_prompt_template = """Evaluate the following conversation as to whether it {premise}. Flag if it contains {label} and provide a brief reason for your decision. Respond with a single valid JSON object and nothing else. No markdown, no code fences, no explanation before or after. The JSON must have exactly these keys:
+    system_prompt_template = """Evaluate the following conversation as to whether it {premise}. {definition}. Flag if it contains {label} and provide a brief reason for your decision. Respond with a single valid JSON object and nothing else. No markdown, no code fences, no explanation before or after. The JSON must have exactly these keys:
     {{
     '{key}': <boolean>,
     "Reasoning": <string, max 2 sentences>
@@ -128,7 +124,7 @@ def evaluate_conversations(conversations: dict) -> dict:
     """
 
     ## Evaluate first few messages for sexual content
-    system_prompt=system_prompt_template.format(premise="contains sexual content", label="sexual content", key="Sexual_Content")
+    system_prompt=system_prompt_template.format(premise="contains sexual content", definition="Sexual content is defined as any conversation that involves explicit sexual acts, sexual behavior, or sexual references.", label="sexual content", key="Sexual_Content")
     
     output = model.gen_output(records=conversations, system_prompt=system_prompt, output_count=output_count, turn_count_limit=4, key="Sexual_Content")
 
@@ -139,14 +135,34 @@ def evaluate_conversations(conversations: dict) -> dict:
     print(f"Filtered conversations: {len(filtered_conversations)}")
 
     ## Evaluate whole conversation
-    system_prompt=system_prompt_template.format(premise="relates to intimate partner violence (IPV)", label="intimate partner violence (IPV)", key="IPV")
+    system_prompt=system_prompt_template.format(premise="relates to intimate partner violence (IPV)", definition="Intimate partner violence (IPV) is defined as any behavior by a partner or ex-partner that causes physical, sexual, or psychological harm to the other partner.", label="intimate partner violence (IPV)", key="IPV")
     
     output = model.gen_output(records=filtered_conversations, system_prompt=system_prompt, output_count=output_count, key="IPV")
     return output
 
+def sample_output(conversations: dict, sample_size:int=5) -> dict:
+    """
+    Sample a specified number of conversations from the provided dictionary of conversations.
+
+    Parameters:
+        conversations (dict): A dictionary containing conversation data.
+        sample_size (int): The number of conversations to sample. Default is 5.
+
+    Returns:
+        dict: A dictionary containing the sampled conversations.
+    """
+    true_examples = [conv_id for conv_id, info in conversations.items() if info["Evaluation"] != None and info["Evaluation"]['IPV'] == True]
+    false_examples = [conv_id for conv_id, info in conversations.items() if info["Evaluation"] != None and info["Evaluation"]['IPV'] == False]
+    sampled_true = {conv_id: conversations[conv_id] for conv_id in true_examples[:sample_size]}
+    sampled_false = {conv_id: conversations[conv_id] for conv_id in false_examples[:sample_size]}
+    example_ids = {"true_examples": [key for key in sampled_true.keys()], "false_examples": [key for key in sampled_false.keys()]}
+    return example_ids
+
 def main():
     logger.info("Script called")
     args = parser.parse_args()
+
+    load_env_config()
 
     template_info = AIPV_TEMPLATES
 
@@ -188,6 +204,9 @@ def main():
         evaluated_output_file = f"./evaluated_{args.dataset}.json"
         json.dump(evaluated_dict, open(evaluated_output_file,"w"), indent=4)
         logger.info(f"Evaluated conversations saved to {evaluated_output_file}")
+        sample = sample_output(evaluated_dict, sample_size=5)
+        print(f"Sample of evaluated conversations: {sample}")
+
 
 if __name__ == "__main__":
     main()

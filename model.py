@@ -85,6 +85,8 @@ class EvaluateModel:
             system_prompt_dict = {"role": "system", "content": system_prompt}
             if self.turn_count_limit is not None:
                 conversation = {f"turn_{i}": conversation[turn] for i, turn in enumerate(conversation) if i < self.turn_count_limit}  ## Create a dictionary of conversation turns with keys "turn_0", "turn_1", up to the turn count limit
+            ## Crop all conversation turns to 1000 characters to avoid exceeding the model's input limit
+            conversation = {turn: conversation[turn][:100] for turn in conversation}
             input = {"role": "user", "content": f"""Evaluate the following conversation. Respond with a single valid JSON object and nothing else. No markdown, no code fences, no explanation before or after. The JSON must have exactly these keys:
             {{
             "{self.key}": <boolean>,
