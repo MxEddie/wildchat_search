@@ -1,17 +1,21 @@
 """
-File containing regex templates for searching conversations in the Wildchat and LMSys-Chat datasets. The templates are organized into categories such as advice, roleplay, breakup, queer, and comeout. Each category contains a list of regex patterns that can be used to identify relevant conversations.
+File containing regex template info for searching conversations in the Wildchat and LMSys-Chat datasets. The template info dictionary contains templates, which are organized into categories. Each category contains a list of regex patterns that can be used to identify relevant conversations. The template info dictionary also contains two sets of categories, set_A and set_B, which can be used to filter conversations based on the presence of specific categories. 
 """
 TEST_TEMPLATES = {
+    "templates": {
     "first_list": [
         r"(help|advise) me"
     ],
     "second_list": [
         r"cook[a-z]*", r"bake[a-z]*"
-    ]
+    ]},
+    "set_A": ["first_list"],
+    "set_B": ["second_list"]
 }
 
 # Define keywords which will be searched for 
 AP4L_TEMPLATES = {
+    "templates": {
     "advice": [
         r"(help|advise) me",
         r"(what |how )?(can|do|should|could) I",
@@ -38,13 +42,18 @@ AP4L_TEMPLATES = {
         r"trans[a-z]*", r"(?!het)[a-z]+sexual",r"(?!cis)[a-z]+gender", r"genderfluid", r"gay", r"(a )?lesbian", r"LGBT[A-Z]*", r"pansexual", r"queer", r"same gender loving", r"a bear", r"a butch", r"a cub", r"a dyke", r"a femme", r"a stud", r"a twink", r"latinx", r"non( |-)?binary", r"enby", r"transfem[a-z]*", r"transmasc(uline)?", r"two( |-)?spirit",r"queer",r"bi",r"pan",r"homo",r"ace"],
     "comeout": [
         r"com(e|ing)? out", r"tell(ing)? ([a-z-]+ )?I('| a)?m", r"let(ting)? ([a-z]+ )+know (that )?I('| a)?m"
-    ]
+    ]},
+    "set_A": ["advice", "roleplay"],
+    "set_B": ["breakup", "queer", "comeout"]
 }
 
 AIPV_TEMPLATES = {
-    "IPV": [
-        r"IPV",r"abuse",r"violen(t|ce)",r"toxic",r"control[a-z]*",r"manipulat[a-z]*",r"abuse",r"isolat[a-z]+",r"threat[a-z]*",r"intimidat[a-z]+",r"stalk[a-z]*",r"harass[a-z]*",r"jealous[a-z]*",r"blam[a-z]*",r"put[a-z]* (me|you) down",r"mak[a-z]* (me|you) feel (stupid|worthless|scared)",r"check[a-z]* (my|your) (phone|emails|texts|messages|facebook|insta(gram)|IG|snap(chat)?)",r"accus[a-z]* (me|you) of cheating",r"force[a-z]* (me|you) to"],
-    "relationship": [
-            r"relationship",r"[a-z]friend",r"bf",r"gf",r"partner",r"wife",r"husband",r"my SO\b",r"dating",r"marriage",r"married",r"fiance(e|é)+",r"engaged",r"spouse",r"significant other",r"my (wo)?man",r"my girl",r"hubby",r"my ex\b"
-        ], 
-    }
+    "templates": {
+        "IPV": [
+            r"IPV",r"abuse",r"violen(t|ce)",r"toxic",r"control[a-z]* me", "is ([a-z]+ )controlling",r"manipulat[a-z]*",r"abuse",r"isolat[a-z]+",r"threat[a-z]*",r"intimidat[a-z]+",r"stalk[a-z]*",r"harass[a-z]*",r"jealous[a-z]*",r"blam[a-z]*",r"put[a-z]* (me|you) down",r"mak[a-z]* (me|you) feel (stupid|worthless|scared)",r"check[a-z]* (my|your) (phone|emails|texts|messages|facebook|insta(gram)|IG|snap(chat)?)",r"accus[a-z]* (me|you) of cheating",r"force[a-z]* (me|you) to"],
+        "relationship": [
+                r"relationship",r"\b[a-z]friend",r"bf",r"gf",r"partner",r"wife",r"husband",r"my SO\b",r"dating",r"marriage",r"married",r"fiance(e|é)+",r"engaged",r"spouse",r"significant other",r"my (wo)?man",r"my girl",r"hubby",r"my ex\b"
+            ]}, 
+    "set_A": ["IPV"],
+    "set_B": ["relationship"]
+}
