@@ -28,7 +28,7 @@ if torch.cuda.is_available():
 else:
     logger.warning("GPU is not available, running on CPU.")
 
-logging.getLogger("httpx2").setLevel(logging.WARNING)
+logging.getLogger("httpx2").setLevel(logging.WARNING) ## Stop HTTPX2 from logging all call info which is very verbose
 logging.getLogger("httpcore").setLevel(logging.WARNING)
 
 
@@ -46,6 +46,7 @@ def _search_args(parser):
     g.add_argument("--dataset",help="which dataset to use",default="wildchat")
     g.add_argument("--data-limit",help="maximum number of instances you want to take", default=None)
     g.add_argument("--search-turn-len-limit", help="maximum length of a single turn in the conversation", type=int, default=8000)
+    g.add_argument("--search-conv-len-limit", help="maximum length of a conversation for searching, if exceeded conversation will be ", type=int, default=1000)
     g.add_argument("--country", help="whether the search should be contained to a particular country",type=str, default=None)
 
 
