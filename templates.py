@@ -1,7 +1,8 @@
 """
 File containing regex template info for searching conversations in the Wildchat and LMSys-Chat datasets. The template info dictionary contains templates, which are organized into categories. Each category contains a list of regex patterns that can be used to identify relevant conversations. The template info dictionary also contains two sets of categories, set_A and set_B, which can be used to filter conversations based on the presence of specific categories. 
 """
-TEST_TEMPLATES = {
+TEMPLATES = {
+"TEST_TEMPLATES": {
     "templates": {
     "first_list": [
         r"(help|advise) me"
@@ -11,10 +12,9 @@ TEST_TEMPLATES = {
     ]},
     "set_A": ["first_list"],
     "set_B": ["second_list"]
-}
-
-# Define keywords which will be searched for 
-AP4L_TEMPLATES = {
+},
+"AP4L_TEMPLATES": {
+    "name": "AP4L_TEMPLATES",
     "templates": {
     "advice": [
         r"(help|advise) me",
@@ -45,9 +45,9 @@ AP4L_TEMPLATES = {
     ]},
     "set_A": ["advice", "roleplay"],
     "set_B": ["breakup", "queer", "comeout"]
-}
-
-TEST_AIPV_TEMPLATES = {
+},
+"TEST_AIPV_TEMPLATES": {
+    "name": "TEST_AIPV_TEMPLATES",
     "templates": {
         "IPV": [
             r"IPV",r"abuse",r"violen(t|ce)",r"toxic",r"control[a-z]* me", "is ([a-z]+ )controlling",r"manipulat[a-z]*",r"abuse",r"isolat[a-z]+",r"threat[a-z]*",r"intimidat[a-z]+",r"stalk[a-z]*",r"harass[a-z]*",r"jealous[a-z]*",r"blam[a-z]*",r"put[a-z]* (me|you) down",r"mak[a-z]* (me|you) feel (stupid|worthless|scared)",r"check[a-z]* (my|your) (phone|emails|texts|messages|facebook|insta(gram)|IG|snap(chat)?)",r"accus[a-z]* (me|you) of cheating",r"force[a-z]* (me|you) to"],
@@ -56,9 +56,9 @@ TEST_AIPV_TEMPLATES = {
             ]}, 
     "set_A": ["IPV"],
     "set_B": ["relationship"]
-}
-
-AIPV_TEMPLATES = {
+},
+"AIPV_TEMPLATES": {
+    "name": "AIPV_TEMPLATES",
     "templates": {
         "control": [
             r"control[a-z]* (((the|my|our) (money|bank account))|(my (appearance|looks|diet|outfit)))"
@@ -72,4 +72,5 @@ AIPV_TEMPLATES = {
             ]},
     "set_A": ["control", "surveillance"],
     "set_B": ["relationship"]
+}
 }

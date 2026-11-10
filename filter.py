@@ -2,6 +2,8 @@
 This module contains the EvaluateModel class, which is responsible for assessing whether conversations in a dataset are relevant to a particular topic. 
 """
 
+import os
+
 import transformers
 import logging
 from time import sleep
@@ -12,6 +14,9 @@ from tqdm import tqdm
     
 
 module_logger = logging.getLogger(__name__)
+transformers.logging.set_verbosity_warning()
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
 
 
 class EvaluateModel:
@@ -154,6 +159,8 @@ class EvaluateModel:
         Returns:
             dict[list[list]]: A dictionary where each key is a prompt and the value is a list of lists containing the generated response and any error encountered during generation.
         """
+        if not records:
+            raise ValueError("No records provided for generation.")
 
         self.turn_count_limit = turn_count_limit  ## Store the turn count limit for use in generating evaluations
         self.key = key  ## Store the key for use in generating evaluation json objects
@@ -163,4 +170,45 @@ class EvaluateModel:
 
         return output_dict  ## Return the output dictionary containing the generated responses and any errors encountered during generation
                 
+
+def filter_conversations(conversations: dict, model_name: str = "Qwen/Qwen3-0.6B", output_count: int = 1) -> dict:
+    model = EvaluateModel(model=model_name, hf_access_token=os.environ.get("HF_TOKEN"), retry_attempts=3)
+
+    system_prompt_template = """Evaluate the following conversation as to whether it {premise}. {definition}. Flag if it contains {label} and provide a brief reason for your decision. Respond with a single valid JSON object and nothing else. No markdown, no code fences, no explanation before or after. The JSON must have exactly these keys:
+    {{
+    '{key}': <boolean>,
+    "Reasoning": <string, max 2 sentences>
+    }}
+    Rules:
+        - Use double quotes for all keys and string values.
+        - Do not add extra keys.
+        - If you are unsure, still return the JSON with your best answer.
+        - Do not include any text outside of the JSON object.
+        - Do not include \\n, \\t, or any other escape characters in the JSON output.
+    
+    """
+
+    ## Evaluate first few messages for sexual content
+    system_prompt=system_prompt_template.format(premise="contains sexual content", definition="Sexual content is defined as any conversation that involves explicit sexual acts, sexual behavior, or sexual references.", label="sexual content", key="Sexual_Content")
+    
+    output = model.gen_output(records=conversations, system_prompt=system_prompt, output_count=output_count, turn_count_limit=4, key="Sexual_Content")
+
+    print(f"Example conversation: {next(iter(output.items()))[1]['Evaluation']}")  ## Print the evaluation of the first conversation for debugging purposes
+
+    ## Filter out conversations which are sexual content
+    filtered_conversations = {conv_id: info for conv_id, info in output.items() if info["Evaluation"] != None and info["Evaluation"]['Sexual_Content'] != True}
+    print(f"Filtered conversations: {len(filtered_conversations)}")
+
+    if len(filtered_conversations) == 0:
+        raise ValueError("No conversations found after filtering out sexual content.")
+
+    ## Evaluate whole conversation
+    system_prompt=system_prompt_template.format(premise="relates to intimate partner violence (IPV)", definition="Intimate partner violence (IPV) is defined as any behavior by a partner or ex-partner that causes physical, sexual, or psychological harm to the other partner.", label="intimate partner violence (IPV)", key="IPV")
+    
+    output = model.gen_output(records=filtered_conversations, system_prompt=system_prompt, output_count=output_count, key="IPV")
+
+    if len(output) == 0:
+        raise ValueError("No conversations found after IPV filtering.")
+    
+    return output
 
