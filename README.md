@@ -13,6 +13,7 @@ Uses regex to match key phrases related to different categories (stored in templ
     - [x] Decide how best to handle long conversation turns (skip, truncate?)
     - [x] For love of god, add ability to save and resume search 
     - [ ] Add ability to resume filtering (e.g. split filter into n number of filtering tasks)
+    - [ ] Add ability to handle arbitrary number of category sets where the conversation must match all n categories to be included
 
 #### To search dataset 
 

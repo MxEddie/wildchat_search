@@ -64,15 +64,16 @@ class FormattedConversation:
                     if turn_len_limit and len(turn["content"]) > turn_len_limit:
                         #print(f"User content too long for conversation {self.id}")
                         content = content[:turn_len_limit]  # truncate the content to the turn length limit
-                        module_logger.warning(f"User content too long for conversation {self.id}, turn {i}, truncating to {turn_len_limit} characters.")
+                        #module_logger.warning(f"User content too long for conversation {self.id}, turn {i}, truncating to {turn_len_limit} characters.")
                     if conv_len_limit and i >= conv_len_limit:
+                        #print(f"Conversation too long for conversation {self.id}")
                         module_logger.warning(f"Conversation too long for conversation {self.id}, truncating to {conv_len_limit} turns.")
                         break
                     for match_type, phrases in template_info["templates"].items():
                         if match_flags[match_type] == False:
                             for phrase in phrases:
                                 pattern = re.compile(phrase,flags=re.I)
-                                match = re.search(pattern,turn["content"])
+                                match = re.search(pattern,content)
                                 if match:
                                     match_flags[match_type] = (match.group(0), f"turn_{i}")  # store the matched phrase and the turn number
                                     if match_type in template_info["set_A"]:
@@ -87,7 +88,6 @@ class FormattedConversation:
                         distance_counter = 0
                         set_A_flag = False
                         set_B_flag = False
-                        break
             break  ## Exit the while loop after one pass through the conversation turns
 
         if any(match_flags[label] for label in template_info["set_A"]) and any(match_flags[label] for label in template_info["set_B"]):

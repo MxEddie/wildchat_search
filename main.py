@@ -47,7 +47,7 @@ def _search_args(parser):
     g.add_argument("--template-set",help="which template set to use for searching",choices=["AP4L_TEMPLATES","AIPV_TEMPLATES","TEST_TEMPLATES"],default="AIPV_TEMPLATES")
     g.add_argument("--test-regex",help="whether to test regex compilation for all templates before searching",action="store_true")
     g.add_argument("--dataset",help="which dataset to use",default="wildchat")
-    g.add_argument("--data-limit",help="maximum number of instances you want to take", default=None)
+    g.add_argument("--data-limit",help="maximum number of instances you want to take", type=int, default=None)
     g.add_argument("--search-turn-len-limit", help="maximum length of a single turn in the conversation", type=int, default=8000)
     g.add_argument("--search-conv-turn-limit", help="maximum length of a conversation for searching in turns, if exceeded remaining turns will be truncated", type=int, default=None)
     g.add_argument("--country", help="whether the search should be contained to a particular country",type=str, default=None)

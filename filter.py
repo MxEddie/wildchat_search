@@ -14,9 +14,6 @@ from tqdm import tqdm
     
 
 module_logger = logging.getLogger(__name__)
-transformers.logging.set_verbosity_warning()
-logging.getLogger("httpx").setLevel(logging.WARNING)
-
 
 
 class EvaluateModel:

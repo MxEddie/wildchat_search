@@ -132,24 +132,41 @@ AIPV_TEMPLATES:
   name: AIPV_TEMPLATES
   templates:
     control:
-    - control[a-z]* (((the|my|our) (money|bank account))|(my (appearance|looks|diet|outfit)))
+    - control[a-z]* (all )?(the|my|our) (money|bank account)
+    - control[a-z]* my (appearance|looks|diet|outfit)
+    - tell[a-z]* me what to (eat|wear)
+    - forc[a-z]* me to
+    - (doesn'?t|won'?t|isn'?t) (let(ting)? me|allow(ing)? me to) (leave the house|((see|(talk|speak) to) my (friends?|family|parents|siblings?|sister|brother|mum|dad|mother|father)))
+    - follows me
+    - call[a-z]* me (constantly|all the time)
+    - check[a-z]* on me on (social media|facebook|insta(gram)?|IG|snap(chat)?)
+    - film[a-z]* me
+    - took my (kid'?s?|children'?s? )passport 
     surveillance:
     - (constantly|always) check[a-z]* where I (am|was)
+    - install?ed a camera
+    - track[a-z]* me
+    jealous:
+    - he('?s| is| can be) ([a-z]+ )*jealous
+    - call[a-z]* me (constantly|all the time)
+    - (ask[a-z]*|to know) where I (am|was)
+    threats:
+    - threaten[a-z]* to [a-z]+ (my |our )?(kids?|child(ren)?|sons?|daughters?|bab(y|ies))
     test:
     - kiss
     relationship:
     - relationship
-    - \b[a-z]friend
-    - bf
-    - gf
-    - partner
+    - \b[a-z]+friend
+    - \bbf\b
+    - \bgf\b
+    - partner\b
     - wife
-    - husband
+    - husband\b
     - my SO\b
     - dating
     - marriage
     - married
-    - fiance(e|é)+
+    - fianc(e|é)+
     - engaged
     - spouse
     - significant other
@@ -158,8 +175,9 @@ AIPV_TEMPLATES:
     - hubby
     - my ex\b
   set_A:
+  - relationship
+  set_B:
   - control
   - surveillance
-  - test
-  set_B:
-  - relationship
+  - jealous
+  - threats
