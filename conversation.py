@@ -3,6 +3,10 @@ A class which takes a conversation from a streamed huggingface dataset and refor
 """
 
 import re
+import logging
+
+module_logger = logging.getLogger(__name__)
+
 
 class FormattedConversation:
     ''' Class which takes a raw conversation from the dataset and reformats it for searching, with each turn within the conversation cleaned of newlines, tabs and quotes. Also stores the conversation ID, model, language, country and hashed IP if available.
@@ -37,7 +41,7 @@ class FormattedConversation:
             example["conversation"][i]["content"] = item["content"].replace("\n"," ").replace("\t"," ").replace('"','').replace("'","")
         self.clean_conv = example["conversation"]       
 
-    def match_phrase(self,template_info: dict, turn_len_limit: str = None) -> dict:
+    def match_phrase(self,template_info: dict, turn_len_limit: int = None, conv_len_limit: int = None) -> dict:
         '''Function which searches through the conversation for a match to any of the provided templates, returning a dictionary of the matches if found, or False if not. If turn_limit is provided, will also return False if any user turn exceeds the limit.
         
         Parameters:
@@ -56,9 +60,14 @@ class FormattedConversation:
         while not set_A_flag and not set_B_flag:
             for i, turn in enumerate(self.clean_conv):
                 if turn["role"] == "user":
+                    content = turn["content"]
                     if turn_len_limit and len(turn["content"]) > turn_len_limit:
                         #print(f"User content too long for conversation {self.id}")
-                        return False
+                        content = content[:turn_len_limit]  # truncate the content to the turn length limit
+                        module_logger.warning(f"User content too long for conversation {self.id}, turn {i}, truncating to {turn_len_limit} characters.")
+                    if conv_len_limit and i >= conv_len_limit:
+                        module_logger.warning(f"Conversation too long for conversation {self.id}, truncating to {conv_len_limit} turns.")
+                        break
                     for match_type, phrases in template_info["templates"].items():
                         if match_flags[match_type] == False:
                             for phrase in phrases:

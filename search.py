@@ -7,7 +7,7 @@ import logging
 
 module_logger = logging.getLogger(__name__)
 
-def search_ds(country:str, template_info:dict, data_limit:int=None, datasetname: str="wildchat",turn_len_limit:int=None) -> dict:
+def search_ds(country:str, template_info:dict, data_limit:int=None, datasetname: str="wildchat",turn_len_limit:int=None, conv_len_limit:int=None) -> dict:
     '''Function which seaches through a stream of the dataset, optionally up to a set limit, and writes matches to an output file, then returns a dataframe of the matches.
     
     Parameters:
@@ -16,6 +16,7 @@ def search_ds(country:str, template_info:dict, data_limit:int=None, datasetname:
         data_limit (int, optional): The maximum number of instances to take from the dataset. If None, all instances will be taken.
         datasetname (str): The name of the dataset to search ("wildchat" or "lmsys-chat").
         turn_len_limit (int, optional): The maximum length of a single user turn in the conversation. If any user turn exceeds this limit, the function will return False.
+        conv_len_limit (int, optional): The maximum length of a conversation for searching, if exceeded remaining turns will be skipped.
     
     Returns:
         dict: A dictionary containing the matched conversations and their details.
@@ -48,7 +49,7 @@ def search_ds(country:str, template_info:dict, data_limit:int=None, datasetname:
             if example["country"] != country:
                 continue
         output = FormattedConversation(example,datasetname)
-        match = output.match_phrase(template_info, turn_len_limit=turn_len_limit) # Turns dictionary with template names as keys and False if no match, otherwise string of matched phrase. If no matches, returns False.
+        match = output.match_phrase(template_info, turn_len_limit=turn_len_limit, conv_len_limit=conv_len_limit) # Turns dictionary with template names as keys and False if no match, otherwise string of matched phrase. If no matches, returns False.
         if match:
             rows.update({output.id: {"Conversation": output.conversation, "Model": output.model, "Hashed IP": output.ip, **{label: match[label] for label in (template_info["templates"].keys())}}})
     

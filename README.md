@@ -9,7 +9,7 @@ Uses regex to match key phrases related to different categories (stored in templ
 
 ## To do
 
-    - [ ] Don't run evaluate on empty file
+    - [x] Don't run evaluate on empty file
     - [ ] Decide how best to handle long conversation turns (skip, truncate?)
 
 #### To search dataset 

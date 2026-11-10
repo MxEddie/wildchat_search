@@ -46,16 +46,15 @@ def _search_args(parser):
     g.add_argument("--dataset",help="which dataset to use",default="wildchat")
     g.add_argument("--data-limit",help="maximum number of instances you want to take", default=None)
     g.add_argument("--search-turn-len-limit", help="maximum length of a single turn in the conversation", type=int, default=8000)
-    g.add_argument("--search-conv-len-limit", help="maximum length of a conversation for searching, if exceeded conversation will be ", type=int, default=1000)
+    g.add_argument("--search-conv-turn-limit", help="maximum length of a conversation for searching in turns, if exceeded remaining turns will be truncated", type=int, default=None)
     g.add_argument("--country", help="whether the search should be contained to a particular country",type=str, default=None)
 
-# meaningless comment 
 
 def _filter_args(parser):
     g = parser.add_argument_group("Filter arguments", "Arguments for filtering matched conversations for relevancy.")
     g.add_argument("--filter-model", help="Huggingface model to use for filtering", type=str, default="Qwen/Qwen3-0.6B")
     g.add_argument("--filter-turn-len-limit", help="maximum length of a single turn in the conversation for filtering, turns truncated to reduce memory load.", type=int, default=100)
-    g.add_argument("--filter-conv-len-limit", help="maximum length of a conversation for filtering, conversations truncated to reduce memory load.", type=int, default=1000)
+    g.add_argument("--filter-conv-len-limit", help="maximum length of a conversation string for filtering, conversations truncated to reduce memory load.", type=int, default=1000)
 
 
 def parse_args():
@@ -105,7 +104,7 @@ def main():
     ## Search the dataset for matching conversations and save to a JSON file, or load from an existing JSON file
     if "search" in args.steps:
         logger.info("Searching dataset for matching conversations")
-        keep_dict = search_ds(country,template_info,data_limit=args.data_limit,turn_len_limit=args.search_turn_len_limit,datasetname=args.dataset)
+        keep_dict = search_ds(country,template_info,data_limit=args.data_limit,conv_len_limit=args.search_conv_turn_limit,turn_len_limit=args.search_turn_len_limit,datasetname=args.dataset)
         logger.info(f"Writing matched conversations to {output_file}")
         json.dump(keep_dict, open(output_file,"w"), indent=4)
     else: 
