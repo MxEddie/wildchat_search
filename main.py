@@ -11,11 +11,13 @@ import pandas as pd
 import logging
 import sys, os
 import json
+import yaml
 from conversation import FormattedConversation
-from templates import TEMPLATES
 from filter import filter_conversations
 from utils import load_env_config, sample_output
 from search import search_ds
+import re
+
 
 
 logging.basicConfig(level=logging.INFO, filename='search.log', filemode='a', format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -43,11 +45,13 @@ def _common_args(parser):
 def _search_args(parser):
     g = parser.add_argument_group("Search arguments", "Arguments for searching dataset(s) for relevant conversations.")
     g.add_argument("--template-set",help="which template set to use for searching",choices=["AP4L_TEMPLATES","AIPV_TEMPLATES","TEST_TEMPLATES"],default="AIPV_TEMPLATES")
+    g.add_argument("--test-regex",help="whether to test regex compilation for all templates before searching",action="store_true")
     g.add_argument("--dataset",help="which dataset to use",default="wildchat")
     g.add_argument("--data-limit",help="maximum number of instances you want to take", default=None)
     g.add_argument("--search-turn-len-limit", help="maximum length of a single turn in the conversation", type=int, default=8000)
     g.add_argument("--search-conv-turn-limit", help="maximum length of a conversation for searching in turns, if exceeded remaining turns will be truncated", type=int, default=None)
     g.add_argument("--country", help="whether the search should be contained to a particular country",type=str, default=None)
+    g.add_argument("--resume-search", help="whether to resume a search from an existing output file", action="store_true")
 
 
 def _filter_args(parser):
@@ -88,8 +92,25 @@ def main():
     load_env_config()
 
     ## Select the template set to use for searching
-    template_info = TEMPLATES[args.template_set]
+
+    ## Select templates from yaml for use for searching
+    with open("templates.yaml", "r", encoding="utf-8") as f:
+        template_info = yaml.safe_load(f)[args.template_set]
     logging.info(f"Using template set: {args.template_set} with templates: {template_info['templates'].keys()}")
+
+    ## Test regex compilation for all templates to catch any errors early
+    if args.test_regex:
+        logger.info("Testing regex compilation for all templates")
+        for template_name, phrases in template_info["templates"].items():
+            logger.info(f"Testing regex compilation for template '{template_name}'")
+            for phrase in phrases:
+                try:
+                    pattern = re.compile(phrase, flags=re.I)
+                    logger.info(f"Phrase '{phrase}' compiled to pattern: {pattern}")
+                except re.error as e:
+                    logger.error(f"Regex compilation error for template '{template_name}' with phrase '{phrase}': {e}")
+                    raise ValueError(f"Regex compilation error for template '{template_name}' with phrase '{phrase}': {e}")
+
 
     if args.country == "UK":
         country = "United Kingdom"
@@ -104,9 +125,7 @@ def main():
     ## Search the dataset for matching conversations and save to a JSON file, or load from an existing JSON file
     if "search" in args.steps:
         logger.info("Searching dataset for matching conversations")
-        keep_dict = search_ds(country,template_info,data_limit=args.data_limit,conv_len_limit=args.search_conv_turn_limit,turn_len_limit=args.search_turn_len_limit,datasetname=args.dataset)
-        logger.info(f"Writing matched conversations to {output_file}")
-        json.dump(keep_dict, open(output_file,"w"), indent=4)
+        keep_dict = search_ds(country,template_info,data_limit=args.data_limit,conv_len_limit=args.search_conv_turn_limit,turn_len_limit=args.search_turn_len_limit,datasetname=args.dataset, resume=args.resume_search, output_file=output_file)
     else: 
         logger.info(f"Loading conversations from file: {output_file}")
         keep_dict = json.load(open(output_file,"r"))
