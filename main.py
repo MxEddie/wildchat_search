@@ -39,20 +39,20 @@ parser = argparse.ArgumentParser()
 
 def _common_args(parser):
     g = parser.add_argument_group("Common arguments", "Arguments for both searching and filtering conversations.")
-    g.add_argument("--output-file",help="path to output file for matched conversations from search.",default=None)
+    g.add_argument("--output-file",help="path to output file for matched conversations from search.",default=None, type=str) # Handling default elsewhere as it depends on dataset name 
 
 
 def _search_args(parser):
     g = parser.add_argument_group("Search arguments", "Arguments for searching dataset(s) for relevant conversations.")
-    g.add_argument("--template-set",help="which template set to use for searching",choices=["AP4L_TEMPLATES","AIPV_TEMPLATES","TEST_TEMPLATES"],default="AIPV_TEMPLATES")
+    g.add_argument("--template-set",help="which template set to use for searching",choices=["AIPV_TEMPLATES"],default="AIPV_TEMPLATES")
     g.add_argument("--test-regex",help="whether to test regex compilation for all templates before searching",action="store_true")
-    g.add_argument("--dataset",help="which dataset to use",default="wildchat")
+    g.add_argument("--dataset",help="which dataset to use",default="wildchat",choices=["wildchat","lmsys-chat"])
+    g.add_argument("--country", help="whether the search should be contained to a particular country",type=str, default=None)
     g.add_argument("--data-limit",help="maximum number of instances you want to take", type=int, default=None)
     g.add_argument("--search-turn-len-limit", help="maximum length of a single turn in the conversation", type=int, default=8000)
     g.add_argument("--search-conv-turn-limit", help="maximum length of a conversation for searching in turns, if exceeded remaining turns will be truncated", type=int, default=None)
-    g.add_argument("--country", help="whether the search should be contained to a particular country",type=str, default=None)
     g.add_argument("--resume-search", help="whether to resume a search from an existing output file", action="store_true")
-    g.add_argument("--test-input", type=str, help="path to a test input file for testing the search function", default=None)
+    g.add_argument("--test-input-file", type=str, help="path to a test input file for testing the search function", default=None)
 
 
 def _filter_args(parser):

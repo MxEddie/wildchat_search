@@ -37,7 +37,7 @@ def load_checkpoint(output_file, resume):
             start = resume if isinstance(resume, int) else 0
     return rows, start
 
-def search_ds(country:str, template_info:dict, data_limit:int=None, datasetname: str="wildchat",turn_len_limit:int=None, conv_len_limit:int=None, resume:bool=False, output_file:str=None, test_input:str=None) -> dict:
+def search_ds(country:str, template_info:dict, data_limit:int=None, datasetname: str="wildchat",turn_len_limit:int=None, conv_len_limit:int=None, resume:bool=False, output_file:str=None, test_input_file:str=None) -> dict:
     '''Function which seaches through a stream of the dataset, optionally up to a set limit, and writes matches to an output file, then returns a dataframe of the matches.
     
     Parameters:
@@ -74,8 +74,8 @@ def search_ds(country:str, template_info:dict, data_limit:int=None, datasetname:
     module_logger.info(f"Writing matched conversations to {output_file}")
 
     try:
-        if test_input:
-            with open(test_input) as test_input:
+        if test_input_file:
+            with open(test_input_file) as test_input:
                 i, example = 0, json.load(test_input)
             print("i:", i, "example:", example)
             output = FormattedConversation(example,datasetname)
