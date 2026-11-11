@@ -57,11 +57,11 @@ def _search_args(parser):
 
 def _filter_args(parser):
     g = parser.add_argument_group("Filter arguments", "Arguments for filtering matched conversations for relevancy.")
-    g.add_argument("--filter-data-limit", help="maximum number of instances you want to take for filtering", type=int, default=None)
+    g.add_argument("--filter-output-file", help="path to output file for filtered conversations", default=None) # Handling default elsewhere as it depends on dataset name 
     g.add_argument("--filter-model", help="Huggingface model to use for filtering", type=str, default="Qwen/Qwen3-0.6B")
+    g.add_argument("--filter-data-limit", help="maximum number of instances you want to take for filtering", type=int, default=None)
     g.add_argument("--filter-turn-len-limit", help="maximum length of a single turn in the conversation for filtering, turns truncated to reduce memory load.", type=int, default=100)
     g.add_argument("--filter-conv-turn-limit", help="maximum length of a conversation for filtering in turns, if exceeded remaining turns will be truncated", type=int, default=None)
-    g.add_argument("--filter-output-file", help="path to output file for filtered conversations", default=None)
     g.add_argument("--resume-filter", help="whether to resume filtering from an existing output file", action="store_true")
 
 
@@ -107,16 +107,21 @@ def run_filtering(conversations, model_name, turn_len_limit, conv_turn_limit, ou
     if data_limit is not None:
         conversations = dict(list(conversations.items())[:data_limit])  ## Limit the number of conversations to process if data_limit is specified
     system_prompt=system_prompt_template.format(premise="contains sexual content", definition="Sexual content is defined as any conversation that involves explicit sexual acts, sexual behavior, or sexual references.", label="sexual content", key="Sexual_Content")
-    filtered_dict = filter_conversations(conversations=conversations, model_name=model_name, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, system_prompt=system_prompt, key="Sexual_Content", filter=True, filter_out=True, resume=resume) ## Filter out sexual content
+    filtered_sexual = filter_conversations(conversations=conversations, model_name=model_name, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, system_prompt=system_prompt, key="Sexual_Content", filter=True, filter_out=True, resume=resume) ## Filter out sexual content
 
     ## Label IPV content
     system_prompt=system_prompt_template.format(premise="relates to intimate partner violence (IPV)", definition="Intimate partner violence (IPV) is defined as any behavior by a partner or ex-partner that causes physical, sexual, or psychological harm to the other partner.", label="intimate partner violence (IPV)", key="IPV")
-    filtered_dict = filter_conversations(conversations=filtered_dict, model_name=model_name, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, system_prompt=system_prompt, key="IPV",resume=resume, filter=True, filter_out=False) ## Filter in IPV content
-    json.dump(filtered_dict, open(output_file,"w"), indent=4)
-    logger.info(f"Filtered conversations saved to {output_file}")
-    sample_ids, sample_conversations = sample_output(filtered_dict, sample_size=5, turn_count_max=2, label="IPV")
-    print(f"IDs of filtered conversations: {sample_ids}")
-    print(f"Sample of filtered conversations: {sample_conversations}")
+    try:
+        filtered_ipv = filter_conversations(conversations=filtered_sexual, model_name=model_name, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, system_prompt=system_prompt, key="IPV",resume=resume, filter=True, filter_out=False) ## Filter in IPV content
+        json.dump(filtered_ipv, open(output_file,"w"), indent=4)
+        logger.info(f"Filtered conversations saved to {output_file}")
+        sample_ids, sample_conversations = sample_output(filtered_ipv, sample_size=5, turn_count_max=2, label="IPV")
+        print(f"IDs of filtered conversations: {sample_ids}")
+        print(f"Sample of filtered conversations: {sample_conversations}")
+    except ValueError as e:
+        logger.error(f"Filtering failed: {e}")
+        print(f"Filtering failed: {e}")
+        json.dump({},open(output_file,"w"), indent=4)
 
 
 def main():
@@ -162,7 +167,7 @@ def main():
     ## Search the dataset for matching conversations and save to a JSON file, or load from an existing JSON file
     if "search" in args.steps:
         logger.info("Searching dataset for matching conversations")
-        keep_dict = search_ds(country,template_info,data_limit=args.data_limit,conv_len_limit=args.search_conv_turn_limit,turn_len_limit=args.search_turn_len_limit,datasetname=args.dataset, resume=args.resume_search, output_file=output_file, test_input=args.test_input)
+        keep_dict = search_ds(country,template_info,data_limit=args.data_limit,conv_len_limit=args.search_conv_turn_limit,turn_len_limit=args.search_turn_len_limit,datasetname=args.dataset, resume=args.resume_search, output_file=output_file, test_input_file=args.test_input_file)
     else: 
         logger.info(f"Loading conversations from file: {output_file}")
         keep_dict = json.load(open(output_file,"r"))

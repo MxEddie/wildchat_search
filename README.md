@@ -6,8 +6,6 @@ A simple python script to search Huggingface datasets for mentions of specific t
 You must export HF_TOKEN to environment. 
 
 
-Uses regex to match key phrases related to different categories 
-
 # WIP
 
 ## To do
@@ -17,6 +15,8 @@ Uses regex to match key phrases related to different categories
     - [x] For love of god, add ability to save and resume search 
     - [x] Add ability to resume filtering (e.g. split filter into n number of filtering tasks)
     - [x] Add ability to handle arbitrary number of category sets where the conversation must match all n categories to be included
+    - [ ] Tidy up how the user can specify the distance between matches (currently hard coded)
+    - [ ] Tidy up how labeling, filtering and saving are handled 
 
 ## Using Model
 
@@ -90,7 +90,9 @@ The design is recursive, so each category can be its own Template Selection Stru
     [--resume-filter] Bool # Whether to resume filtering from existing output file 
 
 
-Filtered data related to breakups analysed in:
+
+
+Regex matched data related to breakups analysed in:
 Eddie L. Ungless and Nishanth Sastry. 2026. I’m Thinking of Ending Things: Use of LLMs for Support During Break-ups. In Proceedings of the Extended Abstracts of the 2026 CHI Conference on Human Factors in Computing Systems, pages 1–9, New York, NY, USA. Association for Computing Machinery.
 
 
