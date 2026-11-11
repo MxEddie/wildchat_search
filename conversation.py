@@ -53,7 +53,7 @@ class FormattedConversation:
             return True
         return False    
 
-    def match_phrase(self,template_info: dict, turn_len_limit: int = None, conv_len_limit: int = None) -> dict:
+    def match_phrase(self,template_info: dict, turn_len_limit: int = None, conv_len_limit: int = None, distance_tolerance: int = 2) -> dict:
         '''Function which searches through the conversation for a match to any of the provided templates, returning a dictionary of the matches if found, or False if not. If turn_limit is provided, will also return False if any user turn exceeds the limit.
         
         Parameters:
@@ -70,10 +70,9 @@ class FormattedConversation:
 
         ## Drop categories from the templates that are not in the sets to avoid unnecessary searching
         for match_category in list(template_info["templates"].keys()):
-            if not any(match_category in template_info[set_name] for set_name in template_info["sets"]):
+            if not any(match_category in template_info[set_name] for set_name in template_info["sets"]) and not any(match_category in template_info[set_name] for set_name in template_info["optional_sets"]):
                 del template_info["templates"][match_category]
 
-        distance_tolerance = 2  # number of turns between matches in different sets to still consider a match
         distance_counter = 0  # counter for the number of turns since the last match in set_A or set_B
 
         while not all(set_flags.values()):  ## Continue searching until a match is found in all sets
@@ -94,7 +93,7 @@ class FormattedConversation:
                             if type(phrases) is dict:
                                 #print(f"Nested template found for {match_category}: {phrases}")
                                 #print(f"Nested template: {phrases}")
-                                match_flags[match_category] = self.match_phrase(template_info=phrases, turn_len_limit=turn_len_limit, conv_len_limit=conv_len_limit)  # recursive call for nested templates
+                                match_flags[match_category] = self.match_phrase(template_info=phrases, turn_len_limit=turn_len_limit, conv_len_limit=conv_len_limit, distance_tolerance=0)  # recursive call for nested templates, do not allow distance tolerance for nested templates
                                 if match_flags[match_category]:
                                     for set_name in template_info["sets"]:
                                         if match_category in template_info[set_name]:

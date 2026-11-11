@@ -41,7 +41,9 @@ def sample_output(conversations: dict, sample_size:int=5, label:str=None, turn_c
         tuple: A tuple containing the sampled conversation IDs and the sampled conversations.
     """
     if turn_count_max is not None:
-        conversations = {conv_id: info for conv_id, info in conversations.items() if len(info["Conversation"]) <= turn_count_max}
+        short_conversations = {conv_id: info for conv_id, info in conversations.items() if len(info["Conversation"]) <= turn_count_max}
+        if short_conversations:
+            conversations = short_conversations
 
     if label == None:
         sample_ids = list(conversations.keys())[:sample_size]

@@ -79,7 +79,7 @@ def search_ds(country:str, template_info:dict, data_limit:int=None, datasetname:
                 i, example = 0, json.load(test_input)
             print("i:", i, "example:", example)
             output = FormattedConversation(example,datasetname)
-            match = output.match_phrase(template_info, turn_len_limit=turn_len_limit, conv_len_limit=conv_len_limit)
+            match = output.match_phrase(template_info, turn_len_limit=turn_len_limit, conv_len_limit=conv_len_limit, distance_tolerance=2) # Allow top level matches to be 2 turns apart 
             if match:
                 rows.update({output.id: {"Conversation": output.clean_conv, "Model": output.model, "Hashed IP": output.ip, **{label: match[label] for label in (template_info["templates"].keys())}}})
         else:

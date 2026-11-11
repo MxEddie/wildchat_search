@@ -151,13 +151,20 @@ class EvaluateModel:
         if output_limit is not None:
             system_prompt = f"{system_prompt} Limit your response to {output_limit} tokens." 
 
-        new_records = copy.deepcopy(records)  ## Create a deep copy of the records to avoid modifying the original data
+        rows, start_index = self.__checkpoint_load(self.output_file, self.resume)
 
-        rows, start_index = self.load_checkpoint(self.output_file, self.resume)
+        if rows == {}:
+            new_records = copy.deepcopy(records)  ## Create a deep copy of the records to avoid modifying the original data
+        else:
+            new_records = copy.deepcopy(rows)  ## Create a deep copy of the rows to avoid modifying the original data
+
+        if start_index == len(records):
+            module_logger.info(f"All records have already been processed. Skipping generation.")
+            return new_records  ## Return the new records if all records have already been processed
 
         try: 
             for i, (record_id, record) in tqdm(enumerate(records.items()), desc=f"Generating {self.key} evaluation for records", unit="record"):
-                if record_id < start_index:
+                if i < start_index:
                     continue
                 new_record = copy.deepcopy(record)  ## Create a deep copy of the record to avoid modifying the original data
                 conversations = record["Conversation"]  ## Get the list of conversations from the record
@@ -173,10 +180,8 @@ class EvaluateModel:
                 if (i + 1) % 100 == 0 and self.output_file is not None:  ## Save progress every 100 records if output_file is specified
                     self.__checkpoint_save(new_records, self.output_file, i + 1)
         finally:
-            if self.output_file is not None:
-                with open(self.output_file, "w") as f:
-                    json.dump(new_records, f, indent=4)  ## Write the new records to the output file in JSON format
-                    module_logger.info(f"Saved generated output to {self.output_file}")
+            self.__checkpoint_save(new_records, self.output_file, i + 1)
+            module_logger.info(f"Final checkpoint saved at index {i + 1}. Total matches: {len(new_records)}")
 
         return new_records  ## Return the new records with the generated output
 
@@ -207,20 +212,19 @@ class EvaluateModel:
         return output_dict  ## Return the output dictionary containing the generated responses and any errors encountered during generation
                 
 
-def filter_conversations(conversations: dict, model_name: str = "Qwen/Qwen3-0.6B", output_count: int = 1, turn_len_limit: int = None, conv_turn_limit: int = None, system_prompt: str = None, key: str = "Sexual_Content", filter_out: bool = False, resume: bool = False) -> dict:
+def filter_conversations(conversations: dict, model_name: str = "Qwen/Qwen3-0.6B", output_count: int = 1, turn_len_limit: int = None, conv_turn_limit: int = None, system_prompt: str = None, key: str = "Sexual_Content", filter = None, filter_out: bool = None, resume: bool = False) -> dict:
     model = EvaluateModel(model=model_name, hf_access_token=os.environ.get("HF_TOKEN"), retry_attempts=3)
     
     output = model.gen_output(records=conversations, system_prompt=system_prompt, output_count=output_count, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, key=key, output_file=f"labelled_output_{key}.json", resume=resume)
 
     print(f"Example conversation: {next(iter(output.items()))[1]['Evaluation']}")  ## Print the evaluation of the first conversation for debugging purposes
 
-
     ## Filter in or out irrelevant conversations
-    filtered_conversations = {conv_id: info for conv_id, info in output.items() if info["Evaluation"] != None and (info["Evaluation"][key] != True if filter_out else info["Evaluation"][key] == True)}
-    print(f"Filtered conversations: {len(filtered_conversations)}")
-
-    if len(filtered_conversations) == 0:
-        raise ValueError("No conversations found after filtering out irrelevant content.")
+    if filter:
+        filtered_conversations = {conv_id: info for conv_id, info in output.items() if info["Evaluation"] != None and info["Evaluation"][key] != filter_out}  ## Filter conversations based on the evaluation of the specified key and whether to filter in or out irrelevant content
+        if len(filtered_conversations) == 0:
+            raise ValueError("No conversations found after filtering out irrelevant content.")
+        return filtered_conversations
     
-    return output
+    return output  ## Return the output dictionary containing the generated evaluations for all conversations
 

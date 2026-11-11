@@ -57,10 +57,12 @@ def _search_args(parser):
 
 def _filter_args(parser):
     g = parser.add_argument_group("Filter arguments", "Arguments for filtering matched conversations for relevancy.")
+    g.add_argument("--filter-data-limit", help="maximum number of instances you want to take for filtering", type=int, default=None)
     g.add_argument("--filter-model", help="Huggingface model to use for filtering", type=str, default="Qwen/Qwen3-0.6B")
     g.add_argument("--filter-turn-len-limit", help="maximum length of a single turn in the conversation for filtering, turns truncated to reduce memory load.", type=int, default=100)
     g.add_argument("--filter-conv-turn-limit", help="maximum length of a conversation for filtering in turns, if exceeded remaining turns will be truncated", type=int, default=None)
     g.add_argument("--filter-output-file", help="path to output file for filtered conversations", default=None)
+    g.add_argument("--resume-filter", help="whether to resume filtering from an existing output file", action="store_true")
 
 
 def parse_args():
@@ -84,7 +86,7 @@ def parse_args():
 
     return parser.parse_args()
 
-def run_filtering(conversations, model_name, turn_len_limit, conv_turn_limit, output_file):
+def run_filtering(conversations, model_name, turn_len_limit, conv_turn_limit, output_file, resume, data_limit=None):
 
     system_prompt_template = """Evaluate the following conversation as to whether it {premise}. {definition}. Flag if it contains {label} and provide a brief reason for your decision. Respond with a single valid JSON object and nothing else. No markdown, no code fences, no explanation before or after. The JSON must have exactly these keys:
         {{
@@ -102,15 +104,17 @@ def run_filtering(conversations, model_name, turn_len_limit, conv_turn_limit, ou
 
 
     ## Label sexual content
+    if data_limit is not None:
+        conversations = dict(list(conversations.items())[:data_limit])  ## Limit the number of conversations to process if data_limit is specified
     system_prompt=system_prompt_template.format(premise="contains sexual content", definition="Sexual content is defined as any conversation that involves explicit sexual acts, sexual behavior, or sexual references.", label="sexual content", key="Sexual_Content")
-    filtered_dict = filter_conversations(conversations=conversations, model_name=model_name, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, system_prompt=system_prompt, key="Sexual_Content", filter_out=True) ## Filter out sexual content
+    filtered_dict = filter_conversations(conversations=conversations, model_name=model_name, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, system_prompt=system_prompt, key="Sexual_Content", filter=True, filter_out=True, resume=resume) ## Filter out sexual content
 
     ## Label IPV content
     system_prompt=system_prompt_template.format(premise="relates to intimate partner violence (IPV)", definition="Intimate partner violence (IPV) is defined as any behavior by a partner or ex-partner that causes physical, sexual, or psychological harm to the other partner.", label="intimate partner violence (IPV)", key="IPV")
-    filtered_dict = filter_conversations(conversations=filtered_dict, model_name=model_name, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, system_prompt=system_prompt, key="IPV", filter_out=False) ## Filter in IPV content
+    filtered_dict = filter_conversations(conversations=filtered_dict, model_name=model_name, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, system_prompt=system_prompt, key="IPV",resume=resume, filter=True, filter_out=False) ## Filter in IPV content
     json.dump(filtered_dict, open(output_file,"w"), indent=4)
     logger.info(f"Filtered conversations saved to {output_file}")
-    sample_ids, sample_conversations = sample_output(filtered_dict, sample_size=5, turn_count_max=2)
+    sample_ids, sample_conversations = sample_output(filtered_dict, sample_size=5, turn_count_max=2, label="IPV")
     print(f"IDs of filtered conversations: {sample_ids}")
     print(f"Sample of filtered conversations: {sample_conversations}")
 
@@ -171,10 +175,14 @@ def main():
 
     ## Sample the matched conversations and print a sample to the console
     sample_ids, sample_conversations = sample_output(keep_dict, sample_size=5, turn_count_max=2)
-    print(f"Sample of matched conversations: {sample_conversations}")
+    #print(f"Sample of matched conversations: {sample_conversations}")
 
     ## Count how many conversations have a match for each template
     assert keep_dict is not None, "No conversations found. Please check your search parameters or the output file."
+    ## Delete categories not in the sets to avoid unnecessary counting
+    for match_category in list(template_info["templates"].keys()):
+        if not any(match_category in template_info[set_name] for set_name in template_info["sets"]) and not any(match_category in template_info[set_name] for set_name in template_info["optional_sets"]):
+            del template_info["templates"][match_category]
     match_counts = {label: 0 for label in template_info["templates"].keys()}
     for conv_id, info in keep_dict.items():
         for label in template_info["templates"].keys():
@@ -186,7 +194,7 @@ def main():
     if "filter" in args.steps:
         logger.info("Filtering matched conversations for relevancy using an LLM")
         try:
-            run_filtering(conversations=keep_dict, model_name=args.filter_model, turn_len_limit=args.filter_turn_len_limit, conv_turn_limit=args.filter_conv_turn_limit, output_file=filter_output_file)
+            run_filtering(conversations=keep_dict, model_name=args.filter_model, turn_len_limit=args.filter_turn_len_limit, conv_turn_limit=args.filter_conv_turn_limit, output_file=filter_output_file, resume=args.resume_filter, data_limit=args.filter_data_limit)
         except ValueError as e:
             logger.error(f"Filtering failed: {e}")
             print(f"Filtering failed: {e}")

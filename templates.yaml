@@ -27,8 +27,12 @@ AIPV_TEMPLATES:
         - threat[a-z]*
         action_words:
         - lose custody
-        - (hurt|harm|kill) (my|our) (pets?|dog|cat|fish|bird|hamster|rabbit|guinea pig|fur ?baby)
-        - '[a-z]+ (my|our) (kids?|child(ren)?|sons?|daughters?|bab(y|ies))'
+        - destroy my (phone|computer|laptop|tablet)
+        - share (my )?(nude |naked )?(images|photos|pictures)
+        - (won|can|wouldn)'?t see my (kids?|child(ren)?|sons?|daughters?|bab(y|ies))
+        - take (my|our)?(kids?|child(ren)?|sons?|daughters?|bab(y|ies)) away
+        - withdraw (my |the )?allegations
+        - (hurt|harm|kill|attack)(ed|s|ing)? ((my|our) ((pets?|dog|cat|fish|bird|hamster|rabbit|guinea pig|fur ?baby)|(kids?|child(ren)?|sons?|daughters?|bab(y|ies))))(me|himself|herself|themselves|themself)
       sets:
       - set_A
       - set_B
@@ -36,19 +40,52 @@ AIPV_TEMPLATES:
       - threat_words
       set_B:
       - action_words
+    other:
+    - makes fun of me when I( am|'?m')?( sad| upset| angry| frustrated| stressed| crying| depressed| anxious| scared| worried)
+    - humiliate[s]? me
+    - sen(d|t)?[a-z]* me (mean|hurtful|insulting|offensive|abusive) (facebook |insta(gram)? |snap(chat)? )?(messages?|texts?|emails?|DMs?|whatsapps?|snaps?)
+    physical_violence:
+    - chok[a-z]* me
+    - strangl[a-z]* me
+    - forc[a-z]* me to have sex
+    legal:
+    - breach[a-z]* his bail
+    - ignore[a-z]* court order
+    - den(y|ies)?[a-z]* (my )?allegations?
+    EMOTIONS:
+      name: EMOTIONS
+      templates:
+        role:
+        - mak[a-z]* me feel
+        - because of (him|this|his)
+        emotions:
+        - afraid
+        - scared
+        - worried I('?|wi)ll (lose|not see) my (kids?|child(ren)?|sons?|daughters?|bab(y|ies))
+        - worried I('?|wi)ll lose my job
+        - can(no|'?)?t trust anyone
+        - no( )?(one|body) can help me
+        - powerless
+        - won'?t believe me
+        - no( )?(one|body) will believe me
+      sets:
+      - set_A
+      - set_B
+      set_A:
+      - emotions
+      set_B:
+      - role    
     test:
     - kiss
     relationship:
-    - relationship
     - \b[a-z]+friend
     - \bbf\b
     - \bgf\b
     - partner\b
-    - wife
-    - husband\b
+    - my wife
+    - my husband\b
     - my SO\b
-    - dating
-    - marriage
+    - dating someone
     - married
     - fianc(e|é)+
     - engaged
@@ -58,10 +95,22 @@ AIPV_TEMPLATES:
     - my girl
     - hubby
     - my ex\b
+    - in a relationship
+    - in a marriage
   sets:
   - set_A
   - set_B
+  optional_sets:
+  - set_C
   set_A:
   - relationship
   set_B:
+  - control
+  - surveillance
+  - jealous
+  - other
+  - legal 
   - THREAT_TEMPLATES
+  - EMOTIONS
+  set_C:
+  - physical_violence
