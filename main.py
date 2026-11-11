@@ -52,13 +52,15 @@ def _search_args(parser):
     g.add_argument("--search-conv-turn-limit", help="maximum length of a conversation for searching in turns, if exceeded remaining turns will be truncated", type=int, default=None)
     g.add_argument("--country", help="whether the search should be contained to a particular country",type=str, default=None)
     g.add_argument("--resume-search", help="whether to resume a search from an existing output file", action="store_true")
+    g.add_argument("--test-input", type=str, help="path to a test input file for testing the search function", default=None)
 
 
 def _filter_args(parser):
     g = parser.add_argument_group("Filter arguments", "Arguments for filtering matched conversations for relevancy.")
     g.add_argument("--filter-model", help="Huggingface model to use for filtering", type=str, default="Qwen/Qwen3-0.6B")
     g.add_argument("--filter-turn-len-limit", help="maximum length of a single turn in the conversation for filtering, turns truncated to reduce memory load.", type=int, default=100)
-    g.add_argument("--filter-conv-len-limit", help="maximum length of a conversation string for filtering, conversations truncated to reduce memory load.", type=int, default=1000)
+    g.add_argument("--filter-conv-turn-limit", help="maximum length of a conversation for filtering in turns, if exceeded remaining turns will be truncated", type=int, default=None)
+    g.add_argument("--filter-output-file", help="path to output file for filtered conversations", default=None)
 
 
 def parse_args():
@@ -81,6 +83,36 @@ def parse_args():
     _filter_args(parser)
 
     return parser.parse_args()
+
+def run_filtering(conversations, model_name, turn_len_limit, conv_turn_limit, output_file):
+
+    system_prompt_template = """Evaluate the following conversation as to whether it {premise}. {definition}. Flag if it contains {label} and provide a brief reason for your decision. Respond with a single valid JSON object and nothing else. No markdown, no code fences, no explanation before or after. The JSON must have exactly these keys:
+        {{
+        '{key}': <boolean>,
+        "Reasoning": <string, max 2 sentences>
+        }}
+        Rules:
+            - Use double quotes for all keys and string values.
+            - Do not add extra keys.
+            - If you are unsure, still return the JSON with your best answer.
+            - Do not include any text outside of the JSON object.
+            - Do not include \\n, \\t, or any other escape characters in the JSON output.
+        
+        """
+
+
+    ## Label sexual content
+    system_prompt=system_prompt_template.format(premise="contains sexual content", definition="Sexual content is defined as any conversation that involves explicit sexual acts, sexual behavior, or sexual references.", label="sexual content", key="Sexual_Content")
+    filtered_dict = filter_conversations(conversations=conversations, model_name=model_name, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, system_prompt=system_prompt, key="Sexual_Content", filter_out=True) ## Filter out sexual content
+
+    ## Label IPV content
+    system_prompt=system_prompt_template.format(premise="relates to intimate partner violence (IPV)", definition="Intimate partner violence (IPV) is defined as any behavior by a partner or ex-partner that causes physical, sexual, or psychological harm to the other partner.", label="intimate partner violence (IPV)", key="IPV")
+    filtered_dict = filter_conversations(conversations=filtered_dict, model_name=model_name, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, system_prompt=system_prompt, key="IPV", filter_out=False) ## Filter in IPV content
+    json.dump(filtered_dict, open(output_file,"w"), indent=4)
+    logger.info(f"Filtered conversations saved to {output_file}")
+    sample_ids, sample_conversations = sample_output(filtered_dict, sample_size=5, turn_count_max=2)
+    print(f"IDs of filtered conversations: {sample_ids}")
+    print(f"Sample of filtered conversations: {sample_conversations}")
 
 
 def main():
@@ -121,11 +153,12 @@ def main():
     logger.info(f"Specified country: {country}")
     
     output_file = args.output_file if args.output_file else f"./matched_{args.dataset}.json"
+    filter_output_file = args.filter_output_file if args.filter_output_file else f"./filtered_{args.dataset}.json"
 
     ## Search the dataset for matching conversations and save to a JSON file, or load from an existing JSON file
     if "search" in args.steps:
         logger.info("Searching dataset for matching conversations")
-        keep_dict = search_ds(country,template_info,data_limit=args.data_limit,conv_len_limit=args.search_conv_turn_limit,turn_len_limit=args.search_turn_len_limit,datasetname=args.dataset, resume=args.resume_search, output_file=output_file)
+        keep_dict = search_ds(country,template_info,data_limit=args.data_limit,conv_len_limit=args.search_conv_turn_limit,turn_len_limit=args.search_turn_len_limit,datasetname=args.dataset, resume=args.resume_search, output_file=output_file, test_input=args.test_input)
     else: 
         logger.info(f"Loading conversations from file: {output_file}")
         keep_dict = json.load(open(output_file,"r"))
@@ -153,13 +186,7 @@ def main():
     if "filter" in args.steps:
         logger.info("Filtering matched conversations for relevancy using an LLM")
         try:
-            filtered_dict = filter_conversations(conversations=keep_dict, model_name=args.filter_model)
-            filtered_output_file = f"./filtered_{args.dataset}.json"
-            json.dump(filtered_dict, open(filtered_output_file,"w"), indent=4)
-            logger.info(f"Filtered conversations saved to {filtered_output_file}")
-            sample_ids, sample_conversations = sample_output(filtered_dict, sample_size=5, turn_count_max=2)
-            print(f"IDs of filtered conversations: {sample_ids}")
-            print(f"Sample of filtered conversations: {sample_conversations}")
+            run_filtering(conversations=keep_dict, model_name=args.filter_model, turn_len_limit=args.filter_turn_len_limit, conv_turn_limit=args.filter_conv_turn_limit, output_file=filter_output_file)
         except ValueError as e:
             logger.error(f"Filtering failed: {e}")
             print(f"Filtering failed: {e}")

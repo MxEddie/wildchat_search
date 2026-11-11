@@ -41,6 +41,33 @@ class EvaluateModel:
         self.kwargs = kwargs ## Handle additional keyword arguments for response generation, such as max_output_tokens, temperature, etc.
 
         self.client = transformers.pipeline("text-generation", model=self.model, token=self.hf_access_token)
+    
+    def __checkpoint_save(self, rows, output_file, next_index):
+        """Atomically overwrite the output file and record progress."""
+        tmp = output_file + ".tmp"
+        with open(tmp, "w") as f:
+            json.dump(rows, f, indent=4)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, output_file)  # atomic overwrite
+
+        with open(output_file + ".progress", "w") as f:
+            f.write(str(next_index))
+
+    def __checkpoint_load(self, output_file, resume):
+        """Return (rows, start_index). Falls back to the `resume` arg if no progress file."""
+        rows, start = {}, 0
+        if resume:
+            if os.path.exists(output_file):
+                with open(output_file) as f:
+                    rows = json.load(f)
+            progress_path = output_file + ".progress"
+            if os.path.exists(progress_path):
+                with open(progress_path) as f:
+                    start = int(f.read().strip())
+            else:
+                start = resume if isinstance(resume, int) else 0
+        return rows, start
 
     def __hf_generate(self, system_prompt_dict: dict, input: list[dict]) -> str:
 
@@ -85,10 +112,10 @@ class EvaluateModel:
 
         for count in range(output_count):
             system_prompt_dict = {"role": "system", "content": system_prompt}
-            if self.turn_count_limit is not None:
-                conversation = {f"turn_{i}": conversation[turn] for i, turn in enumerate(conversation) if i < self.turn_count_limit}  ## Create a dictionary of conversation turns with keys "turn_0", "turn_1", up to the turn count limit
-            ## Crop all conversation turns to 1000 characters to avoid exceeding the model's input limit
-            conversation = {turn: conversation[turn][:100] for turn in conversation}
+            if self.conv_turn_limit is not None:
+                conversation = {f"turn_{i}": conversation[turn] for i, turn in enumerate(conversation) if i < self.conv_turn_limit}  ## Create a dictionary of conversation turns with keys "turn_0", "turn_1", up to the turn count limit
+            ## Crop all conversation turns to the specified length to avoid exceeding the model's input limit
+            conversation = {turn: conversation[turn][:self.turn_len_limit] for turn in conversation}
             input = {"role": "user", "content": f"""Evaluate the following conversation. Respond with a single valid JSON object and nothing else. No markdown, no code fences, no explanation before or after. The JSON must have exactly these keys:
             {{
             "{self.key}": <boolean>,
@@ -126,25 +153,34 @@ class EvaluateModel:
 
         new_records = copy.deepcopy(records)  ## Create a deep copy of the records to avoid modifying the original data
 
-        for record_id, record in tqdm(records.items(), desc=f"Generating {self.key} evaluation for records", unit="record"):
-            new_record = copy.deepcopy(record)  ## Create a deep copy of the record to avoid modifying the original data
-            conversations = record["Conversation"]  ## Get the list of conversations from the record
-            response = self._generate_conversation(conversations, system_prompt, output_count=output_count)  ## Generate the conversation output
-            ## Store json object in the new records, converting from string to dict if necessary
-            try:
-                response = parse_dict(response)  ## Convert the response string to a dictionary using parse_dict function
-            except json.JSONDecodeError:
-                module_logger.error(f"Failed to parse response for record {record_id}. Response: {response}")
-                response = None
+        rows, start_index = self.load_checkpoint(self.output_file, self.resume)
 
-            new_records[record_id]["Evaluation"] = response  ## Store the generated output in the new records  
+        try: 
+            for i, (record_id, record) in tqdm(enumerate(records.items()), desc=f"Generating {self.key} evaluation for records", unit="record"):
+                if record_id < start_index:
+                    continue
+                new_record = copy.deepcopy(record)  ## Create a deep copy of the record to avoid modifying the original data
+                conversations = record["Conversation"]  ## Get the list of conversations from the record
+                response = self._generate_conversation(conversations, system_prompt, output_count=output_count)  ## Generate the conversation output
+                ## Store json object in the new records, converting from string to dict if necessary
+                try:
+                    response = parse_dict(response)  ## Convert the response string to a dictionary using parse_dict function
+                except json.JSONDecodeError:
+                    module_logger.error(f"Failed to parse response for record {record_id}. Response: {response}")
+                    response = None
+
+                new_records[record_id]["Evaluation"] = response  ## Store the generated output in the new records  
+                if (i + 1) % 100 == 0 and self.output_file is not None:  ## Save progress every 100 records if output_file is specified
+                    self.__checkpoint_save(new_records, self.output_file, i + 1)
+        finally:
+            if self.output_file is not None:
+                with open(self.output_file, "w") as f:
+                    json.dump(new_records, f, indent=4)  ## Write the new records to the output file in JSON format
+                    module_logger.info(f"Saved generated output to {self.output_file}")
 
         return new_records  ## Return the new records with the generated output
 
-
-
-
-    def gen_output(self, records: dict, system_prompt=None, output_count=1, turn_count_limit:int = None, key:str = "Sexual_Content") -> dict[list[list]]:
+    def gen_output(self, records: dict, system_prompt=None, output_count=1, turn_len_limit:int = None, conv_turn_limit:int = None, key:str = "Sexual_Content", output_file:str = None, resume: bool = False) -> dict[list[list]]:
         """
         Generate output for input records using the specified model and system prompt. 
 
@@ -159,8 +195,11 @@ class EvaluateModel:
         if not records:
             raise ValueError("No records provided for generation.")
 
-        self.turn_count_limit = turn_count_limit  ## Store the turn count limit for use in generating evaluations
+        self.conv_turn_limit = conv_turn_limit  ## Store the conversation turn limit for use in generating evaluations
+        self.turn_len_limit = turn_len_limit  ## Store the turn length limit for use in generating evaluations
         self.key = key  ## Store the key for use in generating evaluation json objects
+        self.output_file = output_file  ## Store the output file for use in generating evaluation json objects
+        self.resume = resume  ## Store the resume flag for use in generating evaluation json objects
 
         output_dict = self.__generate(records, system_prompt, output_count)  ## Test generation to catch any errors before generating for all prompts
         #print("Output dict:", output_dict)  ## Print the output dict to check the structure of the generated responses
@@ -168,44 +207,20 @@ class EvaluateModel:
         return output_dict  ## Return the output dictionary containing the generated responses and any errors encountered during generation
                 
 
-def filter_conversations(conversations: dict, model_name: str = "Qwen/Qwen3-0.6B", output_count: int = 1) -> dict:
+def filter_conversations(conversations: dict, model_name: str = "Qwen/Qwen3-0.6B", output_count: int = 1, turn_len_limit: int = None, conv_turn_limit: int = None, system_prompt: str = None, key: str = "Sexual_Content", filter_out: bool = False, resume: bool = False) -> dict:
     model = EvaluateModel(model=model_name, hf_access_token=os.environ.get("HF_TOKEN"), retry_attempts=3)
-
-    system_prompt_template = """Evaluate the following conversation as to whether it {premise}. {definition}. Flag if it contains {label} and provide a brief reason for your decision. Respond with a single valid JSON object and nothing else. No markdown, no code fences, no explanation before or after. The JSON must have exactly these keys:
-    {{
-    '{key}': <boolean>,
-    "Reasoning": <string, max 2 sentences>
-    }}
-    Rules:
-        - Use double quotes for all keys and string values.
-        - Do not add extra keys.
-        - If you are unsure, still return the JSON with your best answer.
-        - Do not include any text outside of the JSON object.
-        - Do not include \\n, \\t, or any other escape characters in the JSON output.
     
-    """
-
-    ## Evaluate first few messages for sexual content
-    system_prompt=system_prompt_template.format(premise="contains sexual content", definition="Sexual content is defined as any conversation that involves explicit sexual acts, sexual behavior, or sexual references.", label="sexual content", key="Sexual_Content")
-    
-    output = model.gen_output(records=conversations, system_prompt=system_prompt, output_count=output_count, turn_count_limit=4, key="Sexual_Content")
+    output = model.gen_output(records=conversations, system_prompt=system_prompt, output_count=output_count, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, key=key, output_file=f"labelled_output_{key}.json", resume=resume)
 
     print(f"Example conversation: {next(iter(output.items()))[1]['Evaluation']}")  ## Print the evaluation of the first conversation for debugging purposes
 
-    ## Filter out conversations which are sexual content
-    filtered_conversations = {conv_id: info for conv_id, info in output.items() if info["Evaluation"] != None and info["Evaluation"]['Sexual_Content'] != True}
+
+    ## Filter in or out irrelevant conversations
+    filtered_conversations = {conv_id: info for conv_id, info in output.items() if info["Evaluation"] != None and (info["Evaluation"][key] != True if filter_out else info["Evaluation"][key] == True)}
     print(f"Filtered conversations: {len(filtered_conversations)}")
 
     if len(filtered_conversations) == 0:
-        raise ValueError("No conversations found after filtering out sexual content.")
-
-    ## Evaluate whole conversation
-    system_prompt=system_prompt_template.format(premise="relates to intimate partner violence (IPV)", definition="Intimate partner violence (IPV) is defined as any behavior by a partner or ex-partner that causes physical, sexual, or psychological harm to the other partner.", label="intimate partner violence (IPV)", key="IPV")
-    
-    output = model.gen_output(records=filtered_conversations, system_prompt=system_prompt, output_count=output_count, key="IPV")
-
-    if len(output) == 0:
-        raise ValueError("No conversations found after IPV filtering.")
+        raise ValueError("No conversations found after filtering out irrelevant content.")
     
     return output
 

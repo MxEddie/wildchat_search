@@ -37,7 +37,7 @@ def load_checkpoint(output_file, resume):
             start = resume if isinstance(resume, int) else 0
     return rows, start
 
-def search_ds(country:str, template_info:dict, data_limit:int=None, datasetname: str="wildchat",turn_len_limit:int=None, conv_len_limit:int=None, resume:bool=False, output_file:str=None) -> dict:
+def search_ds(country:str, template_info:dict, data_limit:int=None, datasetname: str="wildchat",turn_len_limit:int=None, conv_len_limit:int=None, resume:bool=False, output_file:str=None, test_input:str=None) -> dict:
     '''Function which seaches through a stream of the dataset, optionally up to a set limit, and writes matches to an output file, then returns a dataframe of the matches.
     
     Parameters:
@@ -74,19 +74,28 @@ def search_ds(country:str, template_info:dict, data_limit:int=None, datasetname:
     module_logger.info(f"Writing matched conversations to {output_file}")
 
     try:
-        for i,example in enumerate(tqdm(dataset)):
-            if i < start_index:
-                continue
+        if test_input:
+            with open(test_input) as test_input:
+                i, example = 0, json.load(test_input)
+            print("i:", i, "example:", example)
+            output = FormattedConversation(example,datasetname)
+            match = output.match_phrase(template_info, turn_len_limit=turn_len_limit, conv_len_limit=conv_len_limit)
+            if match:
+                rows.update({output.id: {"Conversation": output.clean_conv, "Model": output.model, "Hashed IP": output.ip, **{label: match[label] for label in (template_info["templates"].keys())}}})
+        else:
+            for i,example in enumerate(tqdm(dataset)):
+                if i < start_index:
+                    continue
 
-            if example["language"] == "English" and (country is None or example.get("country") == country):
-                output = FormattedConversation(example,datasetname)
-                match = output.match_phrase(template_info, turn_len_limit=turn_len_limit, conv_len_limit=conv_len_limit) # Turns dictionary with template names as keys and False if no match, otherwise string of matched phrase. If no matches, returns False.
-                if match:
-                    rows.update({output.id: {"Conversation": output.conversation, "Model": output.model, "Hashed IP": output.ip, **{label: match[label] for label in (template_info["templates"].keys())}}})
-            
-            if (i + 1) % 1000 == 0:
-                save_checkpoint(rows, output_file, i + 1)
-                module_logger.info(f"Checkpoint saved at index {i + 1}. Total matches so far: {len(rows)}")
+                if example["language"] == "English" and (country is None or example.get("country") == country):
+                    output = FormattedConversation(example,datasetname)
+                    match = output.match_phrase(template_info, turn_len_limit=turn_len_limit, conv_len_limit=conv_len_limit) # Turns dictionary with template names as keys and False if no match, otherwise string of matched phrase. If no matches, returns False.
+                    if match:
+                        rows.update({output.id: {"Conversation": output.conversation, "Model": output.model, "Hashed IP": output.ip, **{label: match[label] for label in (template_info["templates"].keys())}}})
+                
+                if (i + 1) % 1000 == 0:
+                    save_checkpoint(rows, output_file, i + 1)
+                    module_logger.info(f"Checkpoint saved at index {i + 1}. Total matches so far: {len(rows)}")
     finally:
         save_checkpoint(rows, output_file, i + 1)
         module_logger.info(f"Final checkpoint saved at index {i + 1}. Total matches: {len(rows)}")

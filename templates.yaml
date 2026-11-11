@@ -1,133 +1,3 @@
-TEST_TEMPLATES:
-  templates:
-    first_list:
-    - (help|advise) me
-    second_list:
-    - cook[a-z]*
-    - bake[a-z]*
-  set_A:
-  - first_list
-  set_B:
-  - second_list
-AP4L_TEMPLATES:
-  name: AP4L_TEMPLATES
-  templates:
-    advice:
-    - (help|advise) me
-    - (what |how )?(can|do|should|could) I
-    - what'?s the [a-z]+st way to
-    - is it [a-z]+ to
-    - (tell|teach|show) me how (to|I)
-    - (I('?d)* (really )*(want|need|(would )?like)|give me) (your |some |any )?(advice|help|suggestions?|thoughts?|input|ideas?)
-    - how to do (it|that)
-    - is (this|that|it) an? [a-z]+ idea
-    - is my idea [a-z]+
-    - do you have (any |some )?(advice|help|suggestions?|thoughts?|input|ideas?)
-    - what do you think (about|of) (it|that|my|this)
-    roleplay:
-    - pretend (to be|you('| a)?re?) (my|him|her|them|someone|an?)
-    - (role( |-)?)?play as (my|him|her|them|someone|an?)
-    - (pretend|respond|talk|act|behave|speak) (to me )*(like|as( if)?) (you( we| a|')?re? )?(my|him|her|them|someone|an?)
-    - practi[cs]e [a-z]*ing (to )*(my|him|her|them|someone|an?)
-    breakup:
-    - break(ing)?( |-)?up with?
-    - end(ing)? (it|things) with?
-    - finish(ing)? (things )?with?
-    - call(ing)? (it|things) off with?
-    - tell(ing)? (my |a )? ([a-z]+ )+ (that )*(it('| i)?s|we('| a)?re|things are) (finished|over|through|done|thru)
-    - tell(ing)? ([a-z]+ )+ (that )*I('| a)*m (going to |planning on |gonna |finna )*leav[a-z]+
-    - leav(e|ing)? (my |a ) [a-z]+\W?$
-    - (I|we('?ve)?) (need to|should|have to|got to|gotta|gonna)? break( |-)?up
-    - call (off )*(my )*(wedding|engagement)( off )*
-    - \bend (my )*(relationship|engagement)
-    queer:
-    - trans[a-z]*
-    - (?!het)[a-z]+sexual
-    - (?!cis)[a-z]+gender
-    - genderfluid
-    - gay
-    - (a )?lesbian
-    - LGBT[A-Z]*
-    - pansexual
-    - queer
-    - same gender loving
-    - a bear
-    - a butch
-    - a cub
-    - a dyke
-    - a femme
-    - a stud
-    - a twink
-    - latinx
-    - non( |-)?binary
-    - enby
-    - transfem[a-z]*
-    - transmasc(uline)?
-    - two( |-)?spirit
-    - queer
-    - bi
-    - pan
-    - homo
-    - ace
-    comeout:
-    - com(e|ing)? out
-    - tell(ing)? ([a-z-]+ )?I('| a)?m
-    - let(ting)? ([a-z]+ )+know (that )?I('| a)?m
-  set_A:
-  - advice
-  - roleplay
-  set_B:
-  - breakup
-  - queer
-  - comeout
-TEST_AIPV_TEMPLATES:
-  name: TEST_AIPV_TEMPLATES
-  templates:
-    IPV:
-    - IPV
-    - abuse
-    - violen(t|ce)
-    - toxic
-    - control[a-z]* me
-    - is ([a-z]+ )controlling
-    - manipulat[a-z]*
-    - abuse
-    - isolat[a-z]+
-    - threat[a-z]*
-    - intimidat[a-z]+
-    - stalk[a-z]*
-    - harass[a-z]*
-    - jealous[a-z]*
-    - blam[a-z]*
-    - put[a-z]* (me|you) down
-    - mak[a-z]* (me|you) feel (stupid|worthless|scared)
-    - check[a-z]* (my|your) (phone|emails|texts|messages|facebook|insta(gram)|IG|snap(chat)?)
-    - accus[a-z]* (me|you) of cheating
-    - force[a-z]* (me|you) to
-    relationship:
-    - relationship
-    - \b[a-z]friend
-    - bf
-    - gf
-    - partner
-    - wife
-    - husband
-    - my SO\b
-    - dating
-    - marriage
-    - married
-    - fiance(e|é)+
-    - engaged
-    - spouse
-    - significant other
-    - my (wo)?man
-    - my girl
-    - hubby
-    - my ex\b
-  set_A:
-  - IPV
-  set_B:
-  - relationship
 AIPV_TEMPLATES:
   name: AIPV_TEMPLATES
   templates:
@@ -150,8 +20,22 @@ AIPV_TEMPLATES:
     - he('?s| is| can be) ([a-z]+ )*jealous
     - call[a-z]* me (constantly|all the time)
     - (ask[a-z]*|to know) where I (am|was)
-    threats:
-    - threaten[a-z]* to [a-z]+ (my |our )?(kids?|child(ren)?|sons?|daughters?|bab(y|ies))
+    THREAT_TEMPLATES:
+      name: THREAT_TEMPLATES
+      templates:
+        threat_words:
+        - threat[a-z]*
+        action_words:
+        - lose custody
+        - (hurt|harm|kill) (my|our) (pets?|dog|cat|fish|bird|hamster|rabbit|guinea pig|fur ?baby)
+        - '[a-z]+ (my|our) (kids?|child(ren)?|sons?|daughters?|bab(y|ies))'
+      sets:
+      - set_A
+      - set_B
+      set_A:
+      - threat_words
+      set_B:
+      - action_words
     test:
     - kiss
     relationship:
@@ -174,10 +58,10 @@ AIPV_TEMPLATES:
     - my girl
     - hubby
     - my ex\b
+  sets:
+  - set_A
+  - set_B
   set_A:
   - relationship
   set_B:
-  - control
-  - surveillance
-  - jealous
-  - threats
+  - THREAT_TEMPLATES
