@@ -11,7 +11,7 @@ import json
 import copy
 from utils import parse_dict
 from tqdm import tqdm
-    
+from utils import sample_output
 
 module_logger = logging.getLogger(__name__)
 
@@ -212,10 +212,10 @@ class EvaluateModel:
         return output_dict  ## Return the output dictionary containing the generated responses and any errors encountered during generation
                 
 
-def filter_conversations(conversations: dict, model_name: str = "Qwen/Qwen3-0.6B", output_count: int = 1, turn_len_limit: int = None, conv_turn_limit: int = None, system_prompt: str = None, key: str = "Sexual_Content", filter = None, filter_out: bool = None, resume: bool = False) -> dict:
+def filter_conversations(conversations: dict, model_name: str = "Qwen/Qwen3-0.6B", output_count: int = 1, turn_len_limit: int = None, conv_turn_limit: int = None, system_prompt: str = None, key: str = "Sexual_Content", filter = None, filter_out: bool = None, resume: bool = False, output_file: str = None) -> dict:
     model = EvaluateModel(model=model_name, hf_access_token=os.environ.get("HF_TOKEN"), retry_attempts=3)
     
-    output = model.gen_output(records=conversations, system_prompt=system_prompt, output_count=output_count, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, key=key, output_file=f"labelled_output_{key}.json", resume=resume)
+    output = model.gen_output(records=conversations, system_prompt=system_prompt, output_count=output_count, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, key=key, output_file=f"{output_file}.{key}", resume=resume)
 
     print(f"Example conversation: {next(iter(output.items()))[1]['Evaluation']}")  ## Print the evaluation of the first conversation for debugging purposes
 
@@ -227,4 +227,41 @@ def filter_conversations(conversations: dict, model_name: str = "Qwen/Qwen3-0.6B
         return filtered_conversations
     
     return output  ## Return the output dictionary containing the generated evaluations for all conversations
+
+def run_filter(conversations, model_name, turn_len_limit, conv_turn_limit, output_file, resume, data_limit=None):
+
+    system_prompt_template = """Evaluate the following conversation as to whether it {premise}. {definition}. Flag if it contains {label} and provide a brief reason for your decision. Respond with a single valid JSON object and nothing else. No markdown, no code fences, no explanation before or after. The JSON must have exactly these keys:
+        {{
+        '{key}': <boolean>,
+        "Reasoning": <string, max 2 sentences>
+        }}
+        Rules:
+            - Use double quotes for all keys and string values.
+            - Do not add extra keys.
+            - If you are unsure, still return the JSON with your best answer.
+            - Do not include any text outside of the JSON object.
+            - Do not include \\n, \\t, or any other escape characters in the JSON output.
+        
+        """
+
+
+    ## Label sexual content
+    if data_limit is not None:
+        conversations = dict(list(conversations.items())[:data_limit])  ## Limit the number of conversations to process if data_limit is specified
+    system_prompt=system_prompt_template.format(premise="contains sexual content", definition="Sexual content is defined as any conversation that involves explicit sexual acts, sexual behavior, or sexual references.", label="sexual content", key="Sexual_Content")
+    filtered_sexual = filter_conversations(conversations=conversations, model_name=model_name, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, system_prompt=system_prompt, key="Sexual_Content", filter=True, filter_out=True, resume=resume, output_file=output_file) ## Filter out sexual content
+
+    ## Label IPV content
+    system_prompt=system_prompt_template.format(premise="relates to intimate partner violence (IPV)", definition="Intimate partner violence (IPV) is defined as any behavior by a partner or ex-partner that causes physical, sexual, or psychological harm to the other partner.", label="intimate partner violence (IPV)", key="IPV")
+    try:
+        filtered_ipv = filter_conversations(conversations=filtered_sexual, model_name=model_name, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, system_prompt=system_prompt, key="IPV",resume=resume, filter=True, filter_out=False, output_file=output_file) ## Filter in IPV content
+        json.dump(filtered_ipv, open(output_file,"w"), indent=4)
+        module_logger.info(f"Filtered conversations saved to {output_file}")
+        sample_ids, sample_conversations = sample_output(filtered_ipv, sample_size=5, turn_count_max=2, label="IPV")
+        print(f"IDs of filtered conversations: {sample_ids}")
+        print(f"Sample of filtered conversations: {sample_conversations}")
+    except ValueError as e:
+        module_logger.error(f"Filtering failed: {e}")
+        print(f"Filtering failed: {e}")
+        json.dump({},open(output_file,"w"), indent=4)
 

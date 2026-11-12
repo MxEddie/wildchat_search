@@ -1,38 +1,207 @@
-AIPV_TEMPLATES:
-  name: AIPV_TEMPLATES
+BROAD_TEMPLATES:
+  name: BROAD_TEMPLATES
   templates:
+    CONTROL_TARGET_TEMPLATES:
+      name: CONTROL_TEMPLATES
+      templates:
+        control:
+        - control
+        - tell(s|ed|ing)? me\b
+        - sa(aid|ys?|ing) (what |that )I\b
+        - make[s|d|ing]? me\b
+        - decide[s|d|ing]? what I\b
+        - (won''?t|will not) (allow|let) me\b
+        - forc(e|ed|ing)? me\b
+        - wants to know
+        - (have to|makes me) tell (him|her)
+        - check(s|ed|ing)?
+        - track(s|ed|ing)?
+        target:
+        - '(money|bank account)'
+        - '(appearance|looks|diet|outfit|clothes|clothing|style|makeup)'
+        - '(wear|eat|do|say|think)'
+        - 'leave the house'
+        - '(talk to|speak to|see|visit) (my )?(friends?|family|parents|siblings?|sister|brother|mum|dad|mother|father)'
+        - 'where I (am|was)\b'
+      sets:
+      - set_A
+      - set_B
+      set_A:
+      - control
+      set_B:
+      - target
+      tolerance: 0
     control:
-    - control[a-z]* (all )?(the|my|our) (money|bank account)
-    - control[a-z]* my (appearance|looks|diet|outfit)
-    - tell[a-z]* me what to (eat|wear)
-    - forc[a-z]* me to
-    - (doesn'?t|won'?t|isn'?t) (let(ting)? me|allow(ing)? me to) (leave the house|((see|(talk|speak) to) my (friends?|family|parents|siblings?|sister|brother|mum|dad|mother|father)))
-    - follows me
-    - call[a-z]* me (constantly|all the time)
-    - check[a-z]* on me on (social media|facebook|insta(gram)?|IG|snap(chat)?)
-    - film[a-z]* me
-    - took my (kid'?s?|children'?s? )passport 
+    - 'follow(s|ed|ing)? me\b'
+    - 'film(s|ed|ing)? me\b'
+    - '(take|took|taken|hid(den|es)?) (away )?my (kid''?s?|child(ren)?''?s? |daughter''?s?|son''?s?)passport'
+    SURVEILLANCE_TARGET_TEMPLATES:
+      name: SURVEILLANCE_TEMPLATES
+      templates:
+        frequency:
+        - always
+        - constantly
+        - non ?stop
+        - all the time
+        - won''?t stop
+        behaviour:
+        - call(s|ed|ing)? me\b
+        - check(s|ed|ing)? (on me|my)\b
+      sets:
+      - set_A
+      - set_B
+      set_A:
+      - surveillance
+      set_B:
+      - target
+      tolerance: 0
     surveillance:
-    - (constantly|always) check[a-z]* where I (am|was)
-    - install?ed a camera
-    - track[a-z]* me
+    - 'install?(ed)? a (hidden |secret )(camera|spycam|recorder)'
+    - 'track(s|ed|ing)? me\b'
     jealous:
-    - he('?s| is| can be) ([a-z]+ )*jealous
-    - call[a-z]* me (constantly|all the time)
-    - (ask[a-z]*|to know) where I (am|was)
+    - 's?he(''?s| is| can be) ([a-z]+ )*jealous'
+    - 'call(s|ed|ing)? me (constantly|all the time)'
+    - '(ask(s|ed|ing)?|to know) where I (am|was)'
     THREAT_TEMPLATES:
       name: THREAT_TEMPLATES
       templates:
         threat_words:
-        - threat[a-z]*
+        - 'threat[a-z]*'
+        - 'says s?he(''?s| is) going to\b'
+        - 'I(''?| a)?m? (worried|afraid|scared|think) s?he(''?s| is) going to\b'
         action_words:
-        - lose custody
-        - destroy my (phone|computer|laptop|tablet)
-        - share (my )?(nude |naked )?(images|photos|pictures)
-        - (won|can|wouldn)'?t see my (kids?|child(ren)?|sons?|daughters?|bab(y|ies))
-        - take (my|our)?(kids?|child(ren)?|sons?|daughters?|bab(y|ies)) away
-        - withdraw (my |the )?allegations
-        - (hurt|harm|kill|attack)(ed|s|ing)? ((my|our) ((pets?|dog|cat|fish|bird|hamster|rabbit|guinea pig|fur ?baby)|(kids?|child(ren)?|sons?|daughters?|bab(y|ies))))(me|himself|herself|themselves|themself)
+        - 'lose custody'
+        - 'destroy my (phone|computer|laptop|tablet|mobile|iphone|ipad|macbook|pc)'
+        - '(leak|share) (my )?(images|photos|pictures|nudes)'
+        - '(won|can|wouldn)''?t see my (kids?|child(ren)?|sons?|daughters?|bab(y|ies))'
+        - 'take (my|our)?(kids?|child(ren)?|sons?|daughters?|bab(y|ies)) away'
+        - 'withdraw (my |the )?allegations'
+        - '(hurt|harm|kill|attack)(ed|s|ing)? (my|our) ((pets?|dogs?|cats?|fish|birds?|hamsters?|rabbits?|guinea pigs?|fur ?bab(y|ies))|(kids?|child(ren)?|sons?|daughters?|bab(y|ies)))'
+        - '(hurt|harm|kill|attack)(ed|s|ing)? (me|himself|herself|themselves|themself)'
+      sets:
+      - set_A
+      - set_B
+      set_A:
+      - threat_words
+      set_B:
+      - action_words
+      tolerance: 0
+    other:
+    - '(ma(de|kes|ke|king) fun of |laugh(s|ed|ing)? at )me when I( (say|tell (him|her)) (that)? I(''?|a)?m)?( sad| upset| angry| frustrated| stressed| crying| depressed| anxious| scared| worried)'
+    - 'humiliat(ed|ing|es?) me'
+    - 'sen(d|t)?[a-z]* me (mean|hurtful|insulting|offensive|abusive|horrible) (facebook |insta(gram)? |snap(chat)? )?(messages?|texts?|emails?|DMs?|whatsapps?|snaps?)'
+    physical_violence:
+    - 'chok[a-z]* me'
+    - 'strangl[a-z]* me'
+    - 'forc[a-z]* me to have sex'
+    legal:
+    - 'breach[a-z]* (her|his) bail'
+    - 'ignore[a-z]* court order'
+    - 'den(y|ies)?[a-z]* (my )?allegations?'
+    EMOTIONS:
+      name: EMOTIONS
+      templates:
+        role:
+        - 'mak[a-z]* me feel'
+        - 'because of (him|this|his|her)'
+        emotions:
+        - 'afraid'
+        - 'scared'
+        - 'worried I(''?|wi)ll (lose|not see) my (kids?|child(ren)?|sons?|daughters?|bab(y|ies))'
+        - 'worried I(''?|wi)ll lose my job'
+        - 'can(no|''?)?t trust anyone'
+        - 'no( )?(one|body) can help me'
+        - 'powerless'
+        - 'won''?t believe me'
+        - 'no( )?(one|body) will believe me'
+      sets:
+      - set_A
+      - set_B
+      set_A:
+      - emotions
+      set_B:
+      - role    
+      tolerance: 0
+    test:
+    - kiss
+    relationship:
+    - '\b[a-z]+friend'
+    - '\bbf\b'
+    - '\bgf\b'
+    - '\bboyf\b'
+    - '\bpartner\b'
+    - 'my wife'
+    - 'my husband\b'
+    - 'my SO\b'
+    - 'dating someone'
+    - 'married'
+    - 'fianc(e|é)+'
+    - 'engaged'
+    - 'spouse'
+    - 'significant other'
+    - 'my (wo)?man'
+    - 'my girl'
+    - 'hubby'
+    - 'my ex\b'
+    - 'in a relationship'
+    - 'in a marriage'
+  sets:
+  - set_A
+  - set_B
+  optional_sets:
+  - set_C
+  set_A:
+  - relationship
+  set_B:
+  - control
+  - surveillance
+  - jealous
+  - other
+  - legal 
+  - THREAT_TEMPLATES
+  - EMOTIONS
+  set_C:
+  - physical_violence
+
+AIPV_TEMPLATES:
+  name: AIPV_TEMPLATES
+  templates:
+    control:
+    - 'control[a-z]* (all )?(the|my|our) (money|bank account)'
+    - 'control[a-z]* my (appearance|looks|diet|outfit)'
+    - 'tell[a-z]* me what to (wear|eat|do|say|think)'
+    - 'decide[s|d|ing]? what I (can|cannot|can''?t|can''?t) (wear|eat|do|say|think)'
+    - 'forc[a-z]* me to'
+    - '(doesn''?t|won''?t|isn''?t) (let(ting)? me|allow(ing)? me to) (leave the house|((see|(talk|speak) to) my (friends?|family|parents|siblings?|sister|brother|mum|dad|mother|father)))'
+    - 'follow(s|ed|ing)? me\b'
+    - 'call(s|ed|ing)? me (constantly|all the time)'
+    - 'check(s|ed|ing)? on me on (social media|facebook|insta(gram)?|IG|snap(chat)?)'
+    - 'film(s|ed|ing)? me\b'
+    - '(take|took) (away )?my (kid''?s?|child(ren)?''?s? |daughter''?s?|son''?s?)passport'
+    surveillance:
+    - '(constantly|always) check(s|ing)? where I (am|was)'
+    - 'install?(ed)? a camera'
+    - 'track(s|ed|ing)? me\b'
+    jealous:
+    - 's?he(''?s| is| can be) ([a-z]+ )*jealous'
+    - 'call(s|ed|ing)? me (constantly|all the time)'
+    - '(ask(s|ed|ing)?|to know) where I (am|was)'
+    THREAT_TEMPLATES:
+      name: THREAT_TEMPLATES
+      templates:
+        threat_words:
+        - 'threat[a-z]*'
+        - 'says s?he(''?s| is) going to\b'
+        - 'I(''?| a)?m? (worried|afraid|scared|think) s?he(''?s| is) going to\b'
+        action_words:
+        - 'lose custody'
+        - 'destroy my (phone|computer|laptop|tablet|mobile|iphone|ipad|macbook|pc)'
+        - '(leak|share) (my )?(images|photos|pictures|nudes)'
+        - '(won|can|wouldn)''?t see my (kids?|child(ren)?|sons?|daughters?|bab(y|ies))'
+        - 'take (my|our)?(kids?|child(ren)?|sons?|daughters?|bab(y|ies)) away'
+        - 'withdraw (my |the )?allegations'
+        - '(hurt|harm|kill|attack)(ed|s|ing)? (my|our) ((pets?|dogs?|cats?|fish|birds?|hamsters?|rabbits?|guinea pigs?|fur ?bab(y|ies))|(kids?|child(ren)?|sons?|daughters?|bab(y|ies)))'
+        - '(hurt|harm|kill|attack)(ed|s|ing)? (me|himself|herself|themselves|themself)'
       sets:
       - set_A
       - set_B
@@ -41,33 +210,33 @@ AIPV_TEMPLATES:
       set_B:
       - action_words
     other:
-    - makes fun of me when I( am|'?m')?( sad| upset| angry| frustrated| stressed| crying| depressed| anxious| scared| worried)
-    - humiliate[s]? me
-    - sen(d|t)?[a-z]* me (mean|hurtful|insulting|offensive|abusive) (facebook |insta(gram)? |snap(chat)? )?(messages?|texts?|emails?|DMs?|whatsapps?|snaps?)
+    - '(ma(de|kes|ke|king) fun of |laugh(s|ed|ing)? at )me when I( (say|tell (him|her)) (that)? I(''?|a)?m)?( sad| upset| angry| frustrated| stressed| crying| depressed| anxious| scared| worried)'
+    - 'humiliat(ed|ing|es?) me'
+    - 'sen(d|t)?[a-z]* me (mean|hurtful|insulting|offensive|abusive|horrible) (facebook |insta(gram)? |snap(chat)? )?(messages?|texts?|emails?|DMs?|whatsapps?|snaps?)'
     physical_violence:
-    - chok[a-z]* me
-    - strangl[a-z]* me
-    - forc[a-z]* me to have sex
+    - 'chok[a-z]* me'
+    - 'strangl[a-z]* me'
+    - 'forc[a-z]* me to have sex'
     legal:
-    - breach[a-z]* his bail
-    - ignore[a-z]* court order
-    - den(y|ies)?[a-z]* (my )?allegations?
+    - 'breach[a-z]* (her|his) bail'
+    - 'ignore[a-z]* court order'
+    - 'den(y|ies)?[a-z]* (my )?allegations?'
     EMOTIONS:
       name: EMOTIONS
       templates:
         role:
-        - mak[a-z]* me feel
-        - because of (him|this|his)
+        - 'mak[a-z]* me feel'
+        - 'because of (him|this|his|her)'
         emotions:
-        - afraid
-        - scared
-        - worried I('?|wi)ll (lose|not see) my (kids?|child(ren)?|sons?|daughters?|bab(y|ies))
-        - worried I('?|wi)ll lose my job
-        - can(no|'?)?t trust anyone
-        - no( )?(one|body) can help me
-        - powerless
-        - won'?t believe me
-        - no( )?(one|body) will believe me
+        - 'afraid'
+        - 'scared'
+        - 'worried I(''?|wi)ll (lose|not see) my (kids?|child(ren)?|sons?|daughters?|bab(y|ies))'
+        - 'worried I(''?|wi)ll lose my job'
+        - 'can(no|''?)?t trust anyone'
+        - 'no( )?(one|body) can help me'
+        - 'powerless'
+        - 'won''?t believe me'
+        - 'no( )?(one|body) will believe me'
       sets:
       - set_A
       - set_B
@@ -78,25 +247,26 @@ AIPV_TEMPLATES:
     test:
     - kiss
     relationship:
-    - \b[a-z]+friend
-    - \bbf\b
-    - \bgf\b
-    - partner\b
-    - my wife
-    - my husband\b
-    - my SO\b
-    - dating someone
-    - married
-    - fianc(e|é)+
-    - engaged
-    - spouse
-    - significant other
-    - my (wo)?man
-    - my girl
-    - hubby
-    - my ex\b
-    - in a relationship
-    - in a marriage
+    - '\b[a-z]+friend'
+    - '\bbf\b'
+    - '\bgf\b'
+    - '\bboyf\b'
+    - '\bpartner\b'
+    - 'my wife'
+    - 'my husband\b'
+    - 'my SO\b'
+    - 'dating someone'
+    - 'married'
+    - 'fianc(e|é)+'
+    - 'engaged'
+    - 'spouse'
+    - 'significant other'
+    - 'my (wo)?man'
+    - 'my girl'
+    - 'hubby'
+    - 'my ex\b'
+    - 'in a relationship'
+    - 'in a marriage'
   sets:
   - set_A
   - set_B

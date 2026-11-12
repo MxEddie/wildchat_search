@@ -53,7 +53,7 @@ class FormattedConversation:
             return True
         return False    
 
-    def match_phrase(self,template_info: dict, turn_len_limit: int = None, conv_len_limit: int = None, distance_tolerance: int = 2) -> dict:
+    def match_phrase(self,template_info: dict, turn_len_limit: int = None, conv_len_limit: int = None) -> dict:
         '''Function which searches through the conversation for a match to any of the provided templates, returning a dictionary of the matches if found, or False if not. If turn_limit is provided, will also return False if any user turn exceeds the limit.
         
         Parameters:
@@ -67,6 +67,8 @@ class FormattedConversation:
         match_flags = {key: False for key in template_info["templates"].keys()}
 
         set_flags = {key: False for key in template_info["sets"]}  ## Initialize flags for each set to track if a match has been found
+
+        distance_tolerance = template_info.get("tolerance", 0)  ## Default distance tolerance is 0 turns if not specified in the template_info
 
         ## Drop categories from the templates that are not in the sets to avoid unnecessary searching
         for match_category in list(template_info["templates"].keys()):
@@ -93,7 +95,7 @@ class FormattedConversation:
                             if type(phrases) is dict:
                                 #print(f"Nested template found for {match_category}: {phrases}")
                                 #print(f"Nested template: {phrases}")
-                                match_flags[match_category] = self.match_phrase(template_info=phrases, turn_len_limit=turn_len_limit, conv_len_limit=conv_len_limit, distance_tolerance=0)  # recursive call for nested templates, do not allow distance tolerance for nested templates
+                                match_flags[match_category] = self.match_phrase(template_info=phrases, turn_len_limit=turn_len_limit, conv_len_limit=conv_len_limit)  # recursive call for nested templates, don't tolerate distance for nested templates
                                 if match_flags[match_category]:
                                     for set_name in template_info["sets"]:
                                         if match_category in template_info[set_name]:

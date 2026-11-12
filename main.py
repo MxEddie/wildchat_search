@@ -13,9 +13,9 @@ import sys, os
 import json
 import yaml
 from conversation import FormattedConversation
-from filter import filter_conversations
+from filter import run_filter
 from utils import load_env_config, sample_output
-from search import search_ds
+from search import run_search
 import re
 
 
@@ -39,7 +39,8 @@ parser = argparse.ArgumentParser()
 
 def _common_args(parser):
     g = parser.add_argument_group("Common arguments", "Arguments for both searching and filtering conversations.")
-    g.add_argument("--output-file",help="path to output file for matched conversations from search.",default=None, type=str) # Handling default elsewhere as it depends on dataset name 
+    g.add_argument("--output-dir",help="path to output directory for matched and filtered conversations",default=None, type=str) # Handling default elsewhere as it depends on dataset name 
+    g.add_argument("--search-output-file",help="path to output file for matched conversations",default=None, type=str) # Handling default elsewhere as it depends on dataset name
 
 
 def _search_args(parser):
@@ -86,42 +87,6 @@ def parse_args():
 
     return parser.parse_args()
 
-def run_filtering(conversations, model_name, turn_len_limit, conv_turn_limit, output_file, resume, data_limit=None):
-
-    system_prompt_template = """Evaluate the following conversation as to whether it {premise}. {definition}. Flag if it contains {label} and provide a brief reason for your decision. Respond with a single valid JSON object and nothing else. No markdown, no code fences, no explanation before or after. The JSON must have exactly these keys:
-        {{
-        '{key}': <boolean>,
-        "Reasoning": <string, max 2 sentences>
-        }}
-        Rules:
-            - Use double quotes for all keys and string values.
-            - Do not add extra keys.
-            - If you are unsure, still return the JSON with your best answer.
-            - Do not include any text outside of the JSON object.
-            - Do not include \\n, \\t, or any other escape characters in the JSON output.
-        
-        """
-
-
-    ## Label sexual content
-    if data_limit is not None:
-        conversations = dict(list(conversations.items())[:data_limit])  ## Limit the number of conversations to process if data_limit is specified
-    system_prompt=system_prompt_template.format(premise="contains sexual content", definition="Sexual content is defined as any conversation that involves explicit sexual acts, sexual behavior, or sexual references.", label="sexual content", key="Sexual_Content")
-    filtered_sexual = filter_conversations(conversations=conversations, model_name=model_name, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, system_prompt=system_prompt, key="Sexual_Content", filter=True, filter_out=True, resume=resume) ## Filter out sexual content
-
-    ## Label IPV content
-    system_prompt=system_prompt_template.format(premise="relates to intimate partner violence (IPV)", definition="Intimate partner violence (IPV) is defined as any behavior by a partner or ex-partner that causes physical, sexual, or psychological harm to the other partner.", label="intimate partner violence (IPV)", key="IPV")
-    try:
-        filtered_ipv = filter_conversations(conversations=filtered_sexual, model_name=model_name, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, system_prompt=system_prompt, key="IPV",resume=resume, filter=True, filter_out=False) ## Filter in IPV content
-        json.dump(filtered_ipv, open(output_file,"w"), indent=4)
-        logger.info(f"Filtered conversations saved to {output_file}")
-        sample_ids, sample_conversations = sample_output(filtered_ipv, sample_size=5, turn_count_max=2, label="IPV")
-        print(f"IDs of filtered conversations: {sample_ids}")
-        print(f"Sample of filtered conversations: {sample_conversations}")
-    except ValueError as e:
-        logger.error(f"Filtering failed: {e}")
-        print(f"Filtering failed: {e}")
-        json.dump({},open(output_file,"w"), indent=4)
 
 
 def main():
@@ -132,8 +97,6 @@ def main():
 
     load_env_config()
 
-    ## Select the template set to use for searching
-
     ## Select templates from yaml for use for searching
     with open("templates.yaml", "r", encoding="utf-8") as f:
         template_info = yaml.safe_load(f)[args.template_set]
@@ -142,17 +105,17 @@ def main():
     ## Test regex compilation for all templates to catch any errors early
     if args.test_regex:
         logger.info("Testing regex compilation for all templates")
-        for template_name, phrases in template_info["templates"].items():
-            logger.info(f"Testing regex compilation for template '{template_name}'")
+        for category, phrases in template_info["templates"].items():
+            logger.info(f"Testing regex compilation for category '{category}' with phrases: {phrases}")
             for phrase in phrases:
                 try:
                     pattern = re.compile(phrase, flags=re.I)
                     logger.info(f"Phrase '{phrase}' compiled to pattern: {pattern}")
                 except re.error as e:
-                    logger.error(f"Regex compilation error for template '{template_name}' with phrase '{phrase}': {e}")
-                    raise ValueError(f"Regex compilation error for template '{template_name}' with phrase '{phrase}': {e}")
+                    logger.error(f"Regex compilation error for category '{category}' with phrase '{phrase}': {e}")
+                    raise ValueError(f"Regex compilation error for category '{category}' with phrase '{phrase}': {e}")
 
-
+    ## Handle country name variations
     if args.country == "UK":
         country = "United Kingdom"
     elif args.country == "US" or args.country == "USA":
@@ -160,17 +123,32 @@ def main():
     else:
         country = args.country 
     logger.info(f"Specified country: {country}")
-    
-    output_file = args.output_file if args.output_file else f"./matched_{args.dataset}.json"
-    filter_output_file = args.filter_output_file if args.filter_output_file else f"./filtered_{args.dataset}.json"
+
+    ## Define output file paths based on dataset name and user input
+    # Make directories if they don't exist
+    if args.output_dir:
+        # check if the directory exists, if not create it
+        if not os.path.exists(args.output_dir):
+            os.makedirs(args.output_dir)
+            logger.info(f"Created output directory: {args.output_dir}")
+    else:
+        args.output_dir = "./"  # Default to current directory if no output directory is specified
+    if args.search_output_file:
+        search_output_file_path = os.path.join(args.output_dir, args.search_output_file) 
+    else:
+        search_output_file_path = os.path.join(args.output_dir, f"matched_{args.dataset}.json") 
+    if args.filter_output_file:
+        filter_output_file_path = os.path.join(args.output_dir, args.filter_output_file)
+    else:
+        filter_output_file_path = os.path.join(args.output_dir, f"filtered_{args.dataset}.json")
 
     ## Search the dataset for matching conversations and save to a JSON file, or load from an existing JSON file
     if "search" in args.steps:
         logger.info("Searching dataset for matching conversations")
-        keep_dict = search_ds(country,template_info,data_limit=args.data_limit,conv_len_limit=args.search_conv_turn_limit,turn_len_limit=args.search_turn_len_limit,datasetname=args.dataset, resume=args.resume_search, output_file=output_file, test_input_file=args.test_input_file)
+        keep_dict = run_search(country,template_info,data_limit=args.data_limit,conv_len_limit=args.search_conv_turn_limit,turn_len_limit=args.search_turn_len_limit,datasetname=args.dataset, resume=args.resume_search, output_file=search_output_file_path, test_input_file=args.test_input_file)
     else: 
-        logger.info(f"Loading conversations from file: {output_file}")
-        keep_dict = json.load(open(output_file,"r"))
+        logger.info(f"Loading conversations from file: {search_output_file_path}")
+        keep_dict = json.load(open(search_output_file_path,"r"))
         logger.info(f"{len(keep_dict)} conversations loaded from file")
 
     ## Check if any conversations were found and raise an error if not
@@ -191,15 +169,18 @@ def main():
     match_counts = {label: 0 for label in template_info["templates"].keys()}
     for conv_id, info in keep_dict.items():
         for label in template_info["templates"].keys():
-            if info[label]:
-                match_counts[label] += 1
+            try:
+                if info[label]:
+                    match_counts[label] += 1
+            except KeyError:
+                pass  # If the label is not present in the info, skip it
     logger.info(f"Match counts: {match_counts}")
 
     ## Filter matched conversations using an LLM for relevancy and save to a JSON file
     if "filter" in args.steps:
         logger.info("Filtering matched conversations for relevancy using an LLM")
         try:
-            run_filtering(conversations=keep_dict, model_name=args.filter_model, turn_len_limit=args.filter_turn_len_limit, conv_turn_limit=args.filter_conv_turn_limit, output_file=filter_output_file, resume=args.resume_filter, data_limit=args.filter_data_limit)
+            run_filter(conversations=keep_dict, model_name=args.filter_model, turn_len_limit=args.filter_turn_len_limit, conv_turn_limit=args.filter_conv_turn_limit, output_file=filter_output_file_path, resume=args.resume_filter, data_limit=args.filter_data_limit)
         except ValueError as e:
             logger.error(f"Filtering failed: {e}")
             print(f"Filtering failed: {e}")
