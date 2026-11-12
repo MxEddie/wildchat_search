@@ -5,22 +5,22 @@ BROAD_TEMPLATES:
       name: CONTROL_TEMPLATES
       templates:
         control:
-        - control
-        - tell(s|ed|ing)? me\b
-        - sa(aid|ys?|ing) (what |that )I\b
-        - make[s|d|ing]? me\b
-        - decide[s|d|ing]? what I\b
-        - (won''?t|will not) (allow|let) me\b
-        - forc(e|ed|ing)? me\b
-        - wants to know
-        - (have to|makes me) tell (him|her)
-        - check(s|ed|ing)?
-        - track(s|ed|ing)?
+        - 'control'
+        - 'tell(s|ed|ing)? me\b'
+        - 'sa(aid|ys?|ing) (what |that )I\b'
+        - 'make(s|d|ing)? me\b'
+        - 'decide(s|d|ing)? what I\b'
+        - '(won''?t|will not) (allow|let) me\b'
+        - 'forc(e|ed|ing)? me\b'
+        - '(want|ask)(s|ed|ing)? to know'
+        - '(have to|makes me) tell (him|her)'
+        - 'check(s|ed|ing)?'
+        - 'track(s|ed|ing)?'
         target:
-        - '(money|bank account)'
-        - '(appearance|looks|diet|outfit|clothes|clothing|style|makeup)'
-        - '(wear|eat|do|say|think)'
-        - 'leave the house'
+        - '(my|our) (money|bank account)'
+        - 'my (appearance|looks|diet|outfit|clothes|clothing|style|makeup)'
+        - 'I (can )?(wear|eat|do|say|think)'
+        - 'leave (our|the) (flat|house)'
         - '(talk to|speak to|see|visit) (my )?(friends?|family|parents|siblings?|sister|brother|mum|dad|mother|father)'
         - 'where I (am|was)\b'
       sets:
@@ -31,37 +31,77 @@ BROAD_TEMPLATES:
       set_B:
       - target
       tolerance: 0
-    control:
-    - 'follow(s|ed|ing)? me\b'
-    - 'film(s|ed|ing)? me\b'
-    - '(take|took|taken|hid(den|es)?) (away )?my (kid''?s?|child(ren)?''?s? |daughter''?s?|son''?s?)passport'
-    SURVEILLANCE_TARGET_TEMPLATES:
-      name: SURVEILLANCE_TEMPLATES
+    CONTROL_REMOVAL_TEMPLATES:
+      name: CONTROL_REMOVAL_TEMPLATES
       templates:
-        frequency:
-        - always
-        - constantly
-        - non ?stop
-        - all the time
-        - won''?t stop
-        behaviour:
-        - call(s|ed|ing)? me\b
-        - check(s|ed|ing)? (on me|my)\b
+        removal:
+        - 'take(s|n)?'
+        - 'hid(den|es)?'
+        - 'steal(s|n)'
+        - 'destroy(s|ed|ing)?'
+        - 'won''?t let me have'
+        - 'won''?t give me'
+        item:
+        - 'my (kid''?s?|child(ren)?''?s? |daughter''?s?|son''?s?)passport'
+        - 'my (phone|computer|laptop|tablet|mobile|iphone|ipad|macbook|pc)'
+        - 'my (money|pay|cash|bank account|credit card|debit card|wallet)'
       sets:
       - set_A
       - set_B
       set_A:
-      - surveillance
+      - removal
       set_B:
-      - target
+      - item
+      tolerance: 0
+    control:
+    - 'follow(s|ed|ing)? me\b'
+    - 'film(s|ed|ing)? me\b'
+    SURVEILLANCE_TARGET_TEMPLATES:
+      name: SURVEILLANCE_TEMPLATES
+      templates:
+        frequency:
+        - 'always'
+        - 'constantly'
+        - 'non ?stop'
+        - 'all the time'
+        - 'won''?t stop'
+        - 'keeps'
+        behaviour:
+        - 'call(s|ed|ing)? me\b'
+        - 'check(s|ed|ing)? (on me|my)\b'
+      sets:
+      - set_A
+      - set_B
+      set_A:
+      - frequency
+      set_B:
+      - behaviour
       tolerance: 0
     surveillance:
     - 'install?(ed)? a (hidden |secret )(camera|spycam|recorder)'
     - 'track(s|ed|ing)? me\b'
-    jealous:
-    - 's?he(''?s| is| can be) ([a-z]+ )*jealous'
-    - 'call(s|ed|ing)? me (constantly|all the time)'
-    - '(ask(s|ed|ing)?|to know) where I (am|was)'
+    JEALOUS_TEMPLATES:
+      name: JEALOUS_TEMPLATES
+      templates:
+        being:
+        - 's?he(''?s| is| can be)'
+        - 'why is (s?he|my)'
+        jealousy:
+        - 'jealous'
+        - 'controlling'
+        - 'possessive'
+        - 'bossy'
+        - 'insecure'
+        - 'needy'
+        - 'demanding'
+      sets:
+      - set_A
+      - set_B
+      set_A:
+      - being
+      set_B:
+      - jealousy
+      tolerance: 0
     THREAT_TEMPLATES:
       name: THREAT_TEMPLATES
       templates:
@@ -79,36 +119,56 @@ BROAD_TEMPLATES:
         - '(hurt|harm|kill|attack)(ed|s|ing)? (my|our) ((pets?|dogs?|cats?|fish|birds?|hamsters?|rabbits?|guinea pigs?|fur ?bab(y|ies))|(kids?|child(ren)?|sons?|daughters?|bab(y|ies)))'
         - '(hurt|harm|kill|attack)(ed|s|ing)? (me|himself|herself|themselves|themself)'
       sets:
-      - set_A
-      - set_B
+      - set_B # Got rid of threat as too constraining
       set_A:
       - threat_words
       set_B:
       - action_words
       tolerance: 0
-    other:
-    - '(ma(de|kes|ke|king) fun of |laugh(s|ed|ing)? at )me when I( (say|tell (him|her)) (that)? I(''?|a)?m)?( sad| upset| angry| frustrated| stressed| crying| depressed| anxious| scared| worried)'
-    - 'humiliat(ed|ing|es?) me'
-    - 'sen(d|t)?[a-z]* me (mean|hurtful|insulting|offensive|abusive|horrible) (facebook |insta(gram)? |snap(chat)? )?(messages?|texts?|emails?|DMs?|whatsapps?|snaps?)'
+    MOCKING_TEMPLATES:
+      name: MOCKING_TEMPLATES
+      templates:
+        mocking:
+        - 'ma(de|kes|ke|king) fun of me\b'
+        - 'laugh(s|ed|ing)? at me\b'
+        - 'humiliat(ed|ing|es?) me\b'
+        - 'mock(s|ed|ing)? me\b'
+        - 'ridicul(e|es?|ing)? me\b'
+        - 'sen(d|t)?[a-z]* me (mean|hurtful|insulting|offensive|abusive|horrible)'
+        - 'sa(ys?|id) (mean|hurtful|insulting|offensive|abusive|horrible)'
+        situation:
+        - 'I(''?| a)?m? (sad|upset|angry|frustrated|stressed|cry(ing)?|depressed|anxious|scared|worried)'
+        - 'sex'
+        - 'in front of'
+        - '(facebook|insta(gram)?|snap(chat)?s?|messages?|texts?|emails?|DMs?|whatsapps?)'
+      sets:
+      - set_A
+      optional_sets:
+      - set_B
+      set_A:
+      - mocking
+      set_B:
+      - situation
+      tolerance: 0
     physical_violence:
     - 'chok[a-z]* me'
     - 'strangl[a-z]* me'
     - 'forc[a-z]* me to have sex'
     legal:
     - 'breach[a-z]* (her|his) bail'
-    - 'ignore[a-z]* court order'
+    - 'ignor(ing|ed|es?) (my )?court order'
     - 'den(y|ies)?[a-z]* (my )?allegations?'
     EMOTIONS:
       name: EMOTIONS
       templates:
         role:
-        - 'mak[a-z]* me feel'
+        - 'ma(d|k)(es?|ing)? me feel'
         - 'because of (him|this|his|her)'
+        - 'I feel'
         emotions:
         - 'afraid'
         - 'scared'
-        - 'worried I(''?|wi)ll (lose|not see) my (kids?|child(ren)?|sons?|daughters?|bab(y|ies))'
-        - 'worried I(''?|wi)ll lose my job'
+        - 'worried'
         - 'can(no|''?)?t trust anyone'
         - 'no( )?(one|body) can help me'
         - 'powerless'
@@ -153,15 +213,19 @@ BROAD_TEMPLATES:
   set_A:
   - relationship
   set_B:
+  - CONTROL_TARGET_TEMPLATES
+  - CONTROL_REMOVAL_TEMPLATES
   - control
+  - SURVEILLANCE_TARGET_TEMPLATES
   - surveillance
-  - jealous
-  - other
-  - legal 
+  - JEALOUS_TEMPLATES
   - THREAT_TEMPLATES
+  - MOCKING_TEMPLATES
+  - legal
   - EMOTIONS
   set_C:
   - physical_violence
+  tolerance: 8
 
 AIPV_TEMPLATES:
   name: AIPV_TEMPLATES

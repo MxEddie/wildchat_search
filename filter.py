@@ -215,7 +215,7 @@ class EvaluateModel:
 def filter_conversations(conversations: dict, model_name: str = "Qwen/Qwen3-0.6B", output_count: int = 1, turn_len_limit: int = None, conv_turn_limit: int = None, system_prompt: str = None, key: str = "Sexual_Content", filter = None, filter_out: bool = None, resume: bool = False, output_file: str = None) -> dict:
     model = EvaluateModel(model=model_name, hf_access_token=os.environ.get("HF_TOKEN"), retry_attempts=3)
     
-    output = model.gen_output(records=conversations, system_prompt=system_prompt, output_count=output_count, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, key=key, output_file=f"{output_file}.{key}", resume=resume)
+    output = model.gen_output(records=conversations, system_prompt=system_prompt, output_count=output_count, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, key=key, output_file=f"{output_file}.{key}.json", resume=resume)
 
     print(f"Example conversation: {next(iter(output.items()))[1]['Evaluation']}")  ## Print the evaluation of the first conversation for debugging purposes
 
@@ -248,16 +248,24 @@ def run_filter(conversations, model_name, turn_len_limit, conv_turn_limit, outpu
     ## Label sexual content
     if data_limit is not None:
         conversations = dict(list(conversations.items())[:data_limit])  ## Limit the number of conversations to process if data_limit is specified
-    system_prompt=system_prompt_template.format(premise="contains sexual content", definition="Sexual content is defined as any conversation that involves explicit sexual acts, sexual behavior, or sexual references.", label="sexual content", key="Sexual_Content")
+    system_prompt=system_prompt_template.format(
+        premise="contains sexual content", 
+        definition="Sexual content is defined as any conversation that involves explicit sexual acts, sexual behavior, or sexual references.", 
+        label="sexual content", 
+        key="Sexual_Content")
     filtered_sexual = filter_conversations(conversations=conversations, model_name=model_name, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, system_prompt=system_prompt, key="Sexual_Content", filter=True, filter_out=True, resume=resume, output_file=output_file) ## Filter out sexual content
 
     ## Label IPV content
-    system_prompt=system_prompt_template.format(premise="relates to intimate partner violence (IPV)", definition="Intimate partner violence (IPV) is defined as any behavior by a partner or ex-partner that causes physical, sexual, or psychological harm to the other partner.", label="intimate partner violence (IPV)", key="IPV")
+    key = "ISSUES"
+    system_prompt=system_prompt_template.format(
+        premise="relates to romantic relationship issues.", 
+        definition="Romantic relationship issues are defined as any conversation that involves conflicts, disagreements, or problems within a romantic relationship.", label="romantic relationship issues (ISSUES)", 
+        key=f"{key}")
     try:
-        filtered_ipv = filter_conversations(conversations=filtered_sexual, model_name=model_name, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, system_prompt=system_prompt, key="IPV",resume=resume, filter=True, filter_out=False, output_file=output_file) ## Filter in IPV content
+        filtered_ipv = filter_conversations(conversations=filtered_sexual, model_name=model_name, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, system_prompt=system_prompt, key=key,resume=resume, filter=True, filter_out=False, output_file=output_file) ## Filter in IPV contents
         json.dump(filtered_ipv, open(output_file,"w"), indent=4)
         module_logger.info(f"Filtered conversations saved to {output_file}")
-        sample_ids, sample_conversations = sample_output(filtered_ipv, sample_size=5, turn_count_max=2, label="IPV")
+        sample_ids, sample_conversations = sample_output(filtered_ipv, sample_size=5, turn_count_max=2, label=key)
         print(f"IDs of filtered conversations: {sample_ids}")
         print(f"Sample of filtered conversations: {sample_conversations}")
     except ValueError as e:

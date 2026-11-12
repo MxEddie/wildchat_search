@@ -12,7 +12,6 @@ import logging
 import sys, os
 import json
 import yaml
-from conversation import FormattedConversation
 from filter import run_filter
 from utils import load_env_config, sample_output
 from search import run_search
@@ -45,7 +44,7 @@ def _common_args(parser):
 
 def _search_args(parser):
     g = parser.add_argument_group("Search arguments", "Arguments for searching dataset(s) for relevant conversations.")
-    g.add_argument("--template-set",help="which template set to use for searching",choices=["AIPV_TEMPLATES"],default="AIPV_TEMPLATES")
+    g.add_argument("--template-set",help="which template set to use for searching",choices=["AIPV_TEMPLATES", "BROAD_TEMPLATES"],default="AIPV_TEMPLATES")
     g.add_argument("--test-regex",help="whether to test regex compilation for all templates before searching",action="store_true")
     g.add_argument("--dataset",help="which dataset to use",default="wildchat",choices=["wildchat","lmsys-chat"])
     g.add_argument("--country", help="whether the search should be contained to a particular country",type=str, default=None)
