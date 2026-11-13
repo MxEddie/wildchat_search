@@ -12,6 +12,7 @@ from filter import run_filter
 from utils import load_env_config, sample_output, select_relevant_templates
 from search import run_search
 import re
+from datasets import Dataset
 
 
 logging.basicConfig(level=logging.INFO, filename='search.log', filemode='a', format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -169,7 +170,8 @@ def main():
                 pass  # If the label is not present in the info, skip it
     logger.info(f"Match counts: {match_counts}")
 
-    ## Filter matched conversations using an LLM for relevancy and save to a JSON file
+
+    ## Filter matched conversations (as a hugginface data set) using an LLM for relevancy and save to a JSON file
     if "filter" in args.steps:
         logger.info("Filtering matched conversations for relevancy using an LLM")
         try:
