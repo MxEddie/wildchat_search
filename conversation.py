@@ -5,6 +5,8 @@ A class which takes a conversation from a streamed huggingface dataset and refor
 import re
 import logging
 
+from utils import select_relevant_templates
+
 module_logger = logging.getLogger(__name__)
 
 
@@ -71,10 +73,7 @@ class FormattedConversation:
         distance_tolerance = template_info.get("tolerance", 0)  ## Default distance tolerance is 0 turns if not specified in the template_info
 
         ## Drop categories from the templates that are not in the sets to avoid unnecessary searching
-        included_sets = template_info["sets"] + template_info.get("optional_sets", []) # Combine sets and optional_sets into a single dictionary
-        for match_category in list(template_info["templates"].keys()):
-            if not any(match_category in template_info[set_name] for set_name in included_sets):
-                del template_info["templates"][match_category]
+        template_info = select_relevant_templates(template_info)
 
         distance_counter = 0  # counter for the number of turns since the last match in set_A or set_B
 

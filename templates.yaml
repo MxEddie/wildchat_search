@@ -1,3 +1,14 @@
+TEST_TEMPLATES:
+  name: TEST_TEMPLATES
+  templates:
+    test:
+    - 'I'
+  sets:
+  - set_A
+  set_A:
+  - test
+  tolerance: 0
+
 BROAD_TEMPLATES:
   name: BROAD_TEMPLATES
   templates:

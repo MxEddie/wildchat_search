@@ -5,6 +5,14 @@ import logging
 
 module_logger = logging.getLogger(__name__)
 
+def select_relevant_templates(template_info: dict) -> dict:
+    ## Drop categories from the templates that are not in the sets to avoid unnecessary searching
+    included_sets = template_info["sets"] + template_info.get("optional_sets", []) # Combine sets and optional_sets into a single dictionary
+    for match_category in list(template_info["templates"].keys()):
+        if not any(match_category in template_info[set_name] for set_name in included_sets):
+            del template_info["templates"][match_category]
+    return template_info
+
 def parse_dict(text):
     text = re.sub(r"```(?:json)?", "", text).strip()
     try:
