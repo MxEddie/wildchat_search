@@ -167,7 +167,7 @@ def run_search(output_file:str,template_info:dict, datasetname:str, data_limit:O
         for i,example in enumerate(tqdm(dataset, initial=next_index, total=data_limit, desc="Searching dataset")):
             try:
                 if example.get("language") == "English" and (country is None or example.get("country") == country):
-                    hit = search_conversation(rows, example, **search_kwargs)
+                    hit = search_conversation(example, **search_kwargs)
                     if hit:
                         rows[hit[0]] = hit[1]
             except Exception as e:

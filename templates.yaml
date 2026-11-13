@@ -2,7 +2,7 @@ TEST_TEMPLATES:
   name: TEST_TEMPLATES
   templates:
     test:
-    - 'I'
+    - '[a-z]*'
   sets:
   - set_A
   set_A:
