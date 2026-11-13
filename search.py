@@ -93,7 +93,7 @@ def run_search(country:str, template_info:dict, data_limit:int=None, datasetname
                     if match:
                         rows.update({output.id: {"Conversation": output.conversation, "Model": output.model, "Hashed IP": output.ip, **{label: match[label] for label in (template_info["templates"].keys())}}})
                 
-                if (i + 1) % 5000 == 0:
+                if (i + 1) % 10000 == 0:
                     save_checkpoint(rows, output_file, i + 1)
                     module_logger.info(f"Checkpoint saved at index {i + 1}. Total matches so far: {len(rows)}")
     finally:
