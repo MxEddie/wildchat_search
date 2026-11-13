@@ -15,6 +15,8 @@ from utils import sample_output
 
 module_logger = logging.getLogger(__name__)
 
+CHECKPOINT_INTERVAL = 50  # Save progress every 50 conversations, filtering is slow
+
 
 class EvaluateModel:
     """
@@ -177,7 +179,7 @@ class EvaluateModel:
                     response = None
 
                 new_records[record_id]["Evaluation"] = response  ## Store the generated output in the new records  
-                if (i + 1) % 100 == 0 and self.output_file is not None:  ## Save progress every 100 records if output_file is specified
+                if (i + 1) % CHECKPOINT_INTERVAL == 0 and self.output_file is not None:  ## Save progress every 50 records if output_file is specified
                     self.__checkpoint_save(new_records, self.output_file, i + 1)
         finally:
             self.__checkpoint_save(new_records, self.output_file, i + 1)
@@ -210,7 +212,18 @@ class EvaluateModel:
         #print("Output dict:", output_dict)  ## Print the output dict to check the structure of the generated responses
 
         return output_dict  ## Return the output dictionary containing the generated responses and any errors encountered during generation
-                
+
+def filter_in_out(conversation, key, filter_out):
+    conversation_copy = copy.deepcopy(conversation)  ## Create a deep copy of the conversation to avoid modifying the original data
+    for conv_id, info in conversation.items():
+        print(f"Filtering conversation {conv_id} with evaluation: {info.get('Evaluation')}")
+        try:
+            if info["Evaluation"] is not None and info["Evaluation"][key] == filter_out:
+                    del conversation_copy[conv_id]  ## Remove conversations that contain the specified content
+        except Exception as e:
+            print(f"Error occurred while filtering conversation {conv_id} {info}: {e}")
+
+    return conversation_copy
 
 def filter_conversations(conversations: dict, model_name: str = "Qwen/Qwen3-0.6B", output_count: int = 1, turn_len_limit: int = None, conv_turn_limit: int = None, system_prompt: str = None, key: str = "Sexual_Content", filter = None, filter_out: bool = None, resume: bool = False, output_file: str = None) -> dict:
     model = EvaluateModel(model=model_name, hf_access_token=os.environ.get("HF_TOKEN"), retry_attempts=3)
@@ -221,7 +234,11 @@ def filter_conversations(conversations: dict, model_name: str = "Qwen/Qwen3-0.6B
 
     ## Filter in or out irrelevant conversations
     if filter:
-        filtered_conversations = {conv_id: info for conv_id, info in output.items() if info["Evaluation"] != None and info["Evaluation"][key] != filter_out}  ## Filter conversations based on the evaluation of the specified key and whether to filter in or out irrelevant content
+        try:
+            filtered_conversations = filter_in_out(output, key=key, filter_out=filter_out)
+        except Exception as e:
+            module_logger.error(f"Error occurred while filtering conversations: {e}")
+            raise RuntimeError(f"Error occurred while filtering conversations: {e}")
         if len(filtered_conversations) == 0:
             raise ValueError("No conversations found after filtering out irrelevant content.")
         return filtered_conversations
@@ -229,7 +246,9 @@ def filter_conversations(conversations: dict, model_name: str = "Qwen/Qwen3-0.6B
     return output  ## Return the output dictionary containing the generated evaluations for all conversations
 
 def run_filter(conversations, model_name, turn_len_limit, conv_turn_limit, output_file, resume, data_limit=None):
-
+    if data_limit is not None:
+        conversations = dict(list(conversations.items())[:data_limit])  ## Limit the number of conversations to process if data_limit is specified
+    '''
     system_prompt_template = """Evaluate the following conversation as to whether it {premise}. {definition}. Flag if it contains {label} and provide a brief reason for your decision. Respond with a single valid JSON object and nothing else. No markdown, no code fences, no explanation before or after. The JSON must have exactly these keys:
         {{
         '{key}': <boolean>,
@@ -246,23 +265,32 @@ def run_filter(conversations, model_name, turn_len_limit, conv_turn_limit, outpu
 
 
     ## Label sexual content
-    if data_limit is not None:
-        conversations = dict(list(conversations.items())[:data_limit])  ## Limit the number of conversations to process if data_limit is specified
+    
     system_prompt=system_prompt_template.format(
         premise="contains sexual content", 
         definition="Sexual content is defined as any conversation that involves explicit sexual acts, sexual behavior, or sexual references.", 
         label="sexual content", 
         key="Sexual_Content")
-    filtered_sexual = filter_conversations(conversations=conversations, model_name=model_name, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, system_prompt=system_prompt, key="Sexual_Content", filter=True, filter_out=True, resume=resume, output_file=output_file) ## Filter out sexual content
+    conversations = filter_conversations(conversations=conversations, model_name=model_name, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, system_prompt=system_prompt, key="Sexual_Content", filter=True, filter_out=True, resume=resume, output_file=output_file) ## Filter out sexual content
+    '''
 
     ## Label IPV content
-    key = "ISSUES"
-    system_prompt=system_prompt_template.format(
-        premise="relates to romantic relationship issues.", 
-        definition="Romantic relationship issues are defined as any conversation that involves conflicts, disagreements, or problems within a romantic relationship.", label="romantic relationship issues (ISSUES)", 
-        key=f"{key}")
+    key = "IssuesRelated"
+    system_prompt = """You are a helpful conversation analysis system. Your task is to determine whether a conversation involves someone discussing issues in their romantic relationship. Some examples of romantic relationship issues are: disagreements, conflicts, arguments,infidelity, jealousy, control, and communication problems. The user may be asking for advice, venting, or looking to understand their feelings or their partner's behaviour. Flag the conversation if it is related to romantic relationship issues and provide a brief reason for your decision. Respond with a single valid JSON object and nothing else. No markdown, no code fences, no explanation before or after. The JSON must have exactly these keys:
+        {{
+        %s': <boolean>,
+        "Reasoning": <string, max 2 sentences>
+        }}
+        Rules:
+            - Use double quotes for all keys and string values.
+            - Do not add extra keys.
+            - If you are unsure, still return the JSON with your best answer.
+            - Do not include any text outside of the JSON object.
+            - Do not include \\n, \\t, or any other escape characters in the JSON output.
+        
+        """.format(key)
     try:
-        filtered_ipv = filter_conversations(conversations=filtered_sexual, model_name=model_name, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, system_prompt=system_prompt, key=key,resume=resume, filter=True, filter_out=False, output_file=output_file) ## Filter in IPV contents
+        filtered_ipv = filter_conversations(conversations=conversations, model_name=model_name, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, system_prompt=system_prompt, key=key,resume=resume, filter=True, filter_out=False, output_file=output_file) ## Filter in IPV contents
         json.dump(filtered_ipv, open(output_file,"w"), indent=4)
         module_logger.info(f"Filtered conversations saved to {output_file}")
         sample_ids, sample_conversations = sample_output(filtered_ipv, sample_size=5, turn_count_max=2, label=key)

@@ -48,6 +48,9 @@ def sample_output(conversations: dict, sample_size:int=5, label:str=None, turn_c
     Returns:
         tuple: A tuple containing the sampled conversation IDs and the sampled conversations.
     """
+    assert len(conversations) > 0, "No conversations available to sample from."
+    assert sample_size > 0, "Sample size must be greater than 0."
+
     if turn_count_max is not None:
         short_conversations = {}
         while short_conversations == {}:
