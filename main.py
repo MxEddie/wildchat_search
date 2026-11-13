@@ -96,24 +96,6 @@ def main():
 
     load_env_config()
 
-    ## Select templates from yaml for use for searching
-    with open("templates.yaml", "r", encoding="utf-8") as f:
-        template_info = yaml.safe_load(f)[args.template_set]
-    logging.info(f"Using template set: {args.template_set} with templates: {template_info['templates'].keys()}")
-
-    ## Test regex compilation for all templates to catch any errors early
-    if args.test_regex:
-        logger.info("Testing regex compilation for all templates")
-        for category, phrases in template_info["templates"].items():
-            logger.info(f"Testing regex compilation for category '{category}' with phrases: {phrases}")
-            for phrase in phrases:
-                try:
-                    pattern = re.compile(phrase, flags=re.I)
-                    logger.info(f"Phrase '{phrase}' compiled to pattern: {pattern}")
-                except re.error as e:
-                    logger.error(f"Regex compilation error for category '{category}' with phrase '{phrase}': {e}")
-                    raise ValueError(f"Regex compilation error for category '{category}' with phrase '{phrase}': {e}")
-
     ## Handle country name variations
     if args.country == "UK":
         country = "United Kingdom"
@@ -141,45 +123,12 @@ def main():
     else:
         filter_output_file_path = os.path.join(args.output_dir, f"filtered_{args.dataset}.json")
 
-    ## Search the dataset for matching conversations and save to a JSON file, or load from an existing JSON file
-    if "search" in args.steps:
-        logger.info("Searching dataset for matching conversations")
-        keep_dict = run_search(country,template_info,data_limit=args.data_limit,conv_len_limit=args.search_conv_turn_limit,turn_len_limit=args.search_turn_len_limit,datasetname=args.dataset, resume=args.resume_search, output_file=search_output_file_path, test_input_file=args.test_input_file)
-    else: 
-        logger.info(f"Loading conversations from file: {search_output_file_path}")
-        keep_dict = json.load(open(search_output_file_path,"r"))
-        logger.info(f"{len(keep_dict)} conversations loaded from file")
-
-    ## Check if any conversations were found and raise an error if not
-    if len(keep_dict) == 0:
-        raise ValueError("No conversations found. Please check your search parameters or the output file.")
-        
-
-    ## Sample the matched conversations and print a sample to the console
-    sample_ids, sample_conversations = sample_output(keep_dict, sample_size=5, turn_count_max=2)
-    #print(f"Sample of matched conversations: {sample_conversations}")
-
-    ## Count how many conversations have a match for each template
-    assert keep_dict is not None, "No conversations found. Please check your search parameters or the output file."
-    ## Delete categories not in the sets to avoid unnecessary counting
-    for match_category in list(template_info["templates"].keys()):
-        if not any(match_category in template_info[set_name] for set_name in template_info["sets"]) and not any(match_category in template_info[set_name] for set_name in template_info["optional_sets"]):
-            del template_info["templates"][match_category]
-    match_counts = {label: 0 for label in template_info["templates"].keys()}
-    for conv_id, info in keep_dict.items():
-        for label in template_info["templates"].keys():
-            try:
-                if info[label]:
-                    match_counts[label] += 1
-            except KeyError:
-                pass  # If the label is not present in the info, skip it
-    logger.info(f"Match counts: {match_counts}")
 
     ## Filter matched conversations using an LLM for relevancy and save to a JSON file
     if "filter" in args.steps:
-        logger.info("Filtering matched conversations for relevancy using an LLM")
+        logger.info("Filtering all conversations for relevancy using an LLM")
         try:
-            run_filter(conversations=keep_dict, model_name=args.filter_model, turn_len_limit=args.filter_turn_len_limit, conv_turn_limit=args.filter_conv_turn_limit, output_file=filter_output_file_path, resume=args.resume_filter, data_limit=args.filter_data_limit)
+            run_filter(dataset_name=args.dataset, model_name=args.filter_model, turn_len_limit=args.filter_turn_len_limit, conv_turn_limit=args.filter_conv_turn_limit, output_file=filter_output_file_path, resume=args.resume_filter, data_limit=args.filter_data_limit)
         except ValueError as e:
             logger.error(f"Filtering failed: {e}")
             print(f"Filtering failed: {e}")

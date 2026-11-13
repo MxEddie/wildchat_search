@@ -1,0 +1,589 @@
+2026-11-13 11:15:52,064 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 11:15:52,073 - __main__ - WARNING - GPU is not available, running on CPU.
+2026-11-13 11:15:52,074 - __main__ - INFO - Script called
+2026-11-13 11:16:01,625 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 11:16:01,626 - __main__ - WARNING - GPU is not available, running on CPU.
+2026-11-13 11:16:01,627 - __main__ - INFO - Script called
+2026-11-13 11:16:01,628 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='Qwen/Qwen3-0.6B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 11:16:01,628 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 11:16:01,629 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 11:16:01,629 - __main__ - INFO - Specified country: None
+2026-11-13 11:16:01,629 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 11:16:38,699 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 11:16:38,700 - __main__ - WARNING - GPU is not available, running on CPU.
+2026-11-13 11:16:38,701 - __main__ - INFO - Script called
+2026-11-13 11:16:38,702 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='Qwen/Qwen3-0.6B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 11:16:38,702 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 11:16:38,703 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 11:16:38,703 - __main__ - INFO - Specified country: None
+2026-11-13 11:16:38,703 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 11:17:20,442 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 11:17:20,443 - __main__ - WARNING - GPU is not available, running on CPU.
+2026-11-13 11:17:20,444 - __main__ - INFO - Script called
+2026-11-13 11:17:20,445 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='Qwen/Qwen3-0.6B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 11:17:20,445 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 11:17:20,445 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 11:17:20,445 - __main__ - INFO - Specified country: None
+2026-11-13 11:17:20,445 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 11:18:12,791 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 11:18:12,792 - __main__ - WARNING - GPU is not available, running on CPU.
+2026-11-13 11:18:12,793 - __main__ - INFO - Script called
+2026-11-13 11:18:12,794 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='Qwen/Qwen3-0.6B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 11:18:12,794 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 11:18:12,794 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 11:18:12,794 - __main__ - INFO - Specified country: None
+2026-11-13 11:18:12,794 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 11:18:54,107 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 11:18:54,108 - __main__ - WARNING - GPU is not available, running on CPU.
+2026-11-13 11:18:54,109 - __main__ - INFO - Script called
+2026-11-13 11:18:54,109 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='Qwen/Qwen3-0.6B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 11:18:54,110 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 11:18:54,110 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 11:18:54,110 - __main__ - INFO - Specified country: None
+2026-11-13 11:18:54,110 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 11:28:28,064 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 11:28:28,087 - __main__ - INFO - GPU is available.
+2026-11-13 11:28:28,088 - __main__ - INFO - Script called
+2026-11-13 11:28:28,090 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='Qwen/Qwen3-0.6B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 11:28:28,090 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 11:28:28,090 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 11:28:28,090 - __main__ - INFO - Specified country: None
+2026-11-13 11:28:28,090 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 11:31:01,262 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 11:31:01,271 - __main__ - INFO - GPU is available.
+2026-11-13 11:31:01,272 - __main__ - INFO - Script called
+2026-11-13 11:31:01,273 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='Qwen/Qwen3-0.6B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 11:31:01,273 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 11:31:01,273 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 11:31:01,273 - __main__ - INFO - Specified country: None
+2026-11-13 11:31:01,273 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 11:31:38,027 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 11:31:38,038 - __main__ - INFO - GPU is available.
+2026-11-13 11:31:38,040 - __main__ - INFO - Script called
+2026-11-13 11:31:38,041 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='Qwen/Qwen3-0.6B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 11:31:38,042 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 11:31:38,042 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 11:31:38,042 - __main__ - INFO - Specified country: None
+2026-11-13 11:31:38,042 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 11:32:13,337 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 11:32:13,352 - __main__ - INFO - GPU is available.
+2026-11-13 11:32:13,353 - __main__ - INFO - Script called
+2026-11-13 11:32:13,355 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='Qwen/Qwen3-0.6B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 11:32:13,355 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 11:32:13,355 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 11:32:13,356 - __main__ - INFO - Specified country: None
+2026-11-13 11:32:13,356 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 11:33:12,588 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 11:33:12,595 - __main__ - INFO - GPU is available.
+2026-11-13 11:33:12,596 - __main__ - INFO - Script called
+2026-11-13 11:33:12,597 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='Qwen/Qwen3-0.6B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 11:33:12,597 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 11:33:12,598 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 11:33:12,598 - __main__ - INFO - Specified country: None
+2026-11-13 11:33:12,598 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 11:37:34,672 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 11:37:34,680 - __main__ - INFO - GPU is available.
+2026-11-13 11:37:34,681 - __main__ - INFO - Script called
+2026-11-13 11:37:34,682 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='Qwen/Qwen3-0.6B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 11:37:34,682 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 11:37:34,682 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 11:37:34,682 - __main__ - INFO - Specified country: None
+2026-11-13 11:37:34,682 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 11:37:58,732 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 11:37:58,741 - __main__ - INFO - GPU is available.
+2026-11-13 11:37:58,742 - __main__ - INFO - Script called
+2026-11-13 11:37:58,743 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='Qwen/Qwen3-0.6B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 11:37:58,744 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 11:37:58,744 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 11:37:58,744 - __main__ - INFO - Specified country: None
+2026-11-13 11:37:58,744 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 11:38:08,211 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 11:38:08,219 - __main__ - INFO - GPU is available.
+2026-11-13 11:38:08,220 - __main__ - INFO - Script called
+2026-11-13 11:38:08,221 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='Qwen/Qwen3-0.6B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 11:38:08,221 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 11:38:08,222 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 11:38:08,222 - __main__ - INFO - Specified country: None
+2026-11-13 11:38:08,222 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 11:38:42,358 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 11:38:42,370 - __main__ - INFO - GPU is available.
+2026-11-13 11:38:42,371 - __main__ - INFO - Script called
+2026-11-13 11:38:42,373 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='Qwen/Qwen3-0.6B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 11:38:42,373 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 11:38:42,373 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 11:38:42,373 - __main__ - INFO - Specified country: None
+2026-11-13 11:38:42,373 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 11:40:02,925 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 11:40:02,933 - __main__ - INFO - GPU is available.
+2026-11-13 11:40:02,934 - __main__ - INFO - Script called
+2026-11-13 11:40:02,935 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='Qwen/Qwen3-0.6B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 11:40:02,935 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 11:40:02,935 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 11:40:02,935 - __main__ - INFO - Specified country: None
+2026-11-13 11:40:02,936 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 11:40:40,732 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 11:40:40,740 - __main__ - INFO - GPU is available.
+2026-11-13 11:40:40,741 - __main__ - INFO - Script called
+2026-11-13 11:40:40,742 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='Qwen/Qwen3-0.6B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 11:40:40,742 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 11:40:40,742 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 11:40:40,742 - __main__ - INFO - Specified country: None
+2026-11-13 11:40:40,742 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 11:41:06,716 - filter - INFO - Final checkpoint saved at index 2. Total matches: 0
+2026-11-13 11:42:41,003 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 11:42:41,015 - __main__ - INFO - GPU is available.
+2026-11-13 11:42:41,016 - __main__ - INFO - Script called
+2026-11-13 11:42:41,018 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='Qwen/Qwen3-0.6B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 11:42:41,018 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 11:42:41,018 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 11:42:41,018 - __main__ - INFO - Specified country: None
+2026-11-13 11:42:41,018 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 11:42:49,098 - filter - INFO - Final checkpoint saved at index 2. Total matches: 0
+2026-11-13 11:44:37,098 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 11:44:37,106 - __main__ - INFO - GPU is available.
+2026-11-13 11:44:37,107 - __main__ - INFO - Script called
+2026-11-13 11:44:37,108 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='Qwen/Qwen3-0.6B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 11:44:37,108 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 11:44:37,109 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 11:44:37,109 - __main__ - INFO - Specified country: None
+2026-11-13 11:44:37,109 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 11:44:44,546 - filter - INFO - Final checkpoint saved at index 2. Total matches: 0
+2026-11-13 11:45:33,121 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 11:45:33,129 - __main__ - INFO - GPU is available.
+2026-11-13 11:45:33,130 - __main__ - INFO - Script called
+2026-11-13 11:45:33,131 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='Qwen/Qwen3-0.6B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 11:45:33,131 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 11:45:33,131 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 11:45:33,131 - __main__ - INFO - Specified country: None
+2026-11-13 11:45:33,131 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 11:45:40,484 - filter - INFO - Final checkpoint saved at index 2. Total matches: 0
+2026-11-13 11:48:22,750 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 11:48:22,761 - __main__ - INFO - GPU is available.
+2026-11-13 11:48:22,763 - __main__ - INFO - Script called
+2026-11-13 11:48:22,764 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='Qwen/Qwen3-0.6B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 11:48:22,764 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 11:48:22,764 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 11:48:22,764 - __main__ - INFO - Specified country: None
+2026-11-13 11:48:22,764 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 11:48:30,361 - filter - INFO - Final checkpoint saved at index 2. Total matches: 0
+2026-11-13 11:49:35,168 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 11:49:35,178 - __main__ - INFO - GPU is available.
+2026-11-13 11:49:35,180 - __main__ - INFO - Script called
+2026-11-13 11:49:35,181 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='mistralai/Mistral-Small-4-119B-2603', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 11:49:35,181 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 11:49:35,181 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 11:49:35,181 - __main__ - INFO - Specified country: None
+2026-11-13 11:49:35,181 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 11:50:00,392 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 11:50:00,403 - __main__ - INFO - GPU is available.
+2026-11-13 11:50:00,404 - __main__ - INFO - Script called
+2026-11-13 11:50:00,405 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='mistralai/Mistral-Small-4-119B-2603', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 11:50:00,406 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 11:50:00,406 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 11:50:00,406 - __main__ - INFO - Specified country: None
+2026-11-13 11:50:00,406 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 12:04:01,539 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 12:04:01,552 - __main__ - INFO - GPU is available.
+2026-11-13 12:04:01,553 - __main__ - INFO - Script called
+2026-11-13 12:04:01,554 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='deepseek-ai/Janus-Pro-7B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 12:04:01,554 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 12:04:01,555 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 12:04:01,555 - __main__ - INFO - Specified country: None
+2026-11-13 12:04:01,555 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 12:04:06,514 - filter - ERROR - Filtering failed: The checkpoint you are trying to load has model type `multi_modality` but Transformers does not recognize this architecture. This could be because of an issue with the checkpoint, or because your version of Transformers is out of date.
+
+You can update Transformers with the command `pip install --upgrade transformers`. If this does not work, and the checkpoint is very new, then there may not be a release version that supports this model yet. In this case, you can get the most up-to-date code by installing Transformers from source with the command `pip install git+https://github.com/huggingface/transformers.git`
+2026-11-13 12:04:06,515 - __main__ - INFO - Script run complete
+2026-11-13 12:04:37,395 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 12:04:37,406 - __main__ - INFO - GPU is available.
+2026-11-13 12:04:37,407 - __main__ - INFO - Script called
+2026-11-13 12:04:37,408 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='deepseek-ai/Janus-Pro-7B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 12:04:37,409 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 12:04:37,409 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 12:04:37,409 - __main__ - INFO - Specified country: None
+2026-11-13 12:04:37,409 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 12:04:41,600 - filter - ERROR - Filtering failed: The checkpoint you are trying to load has model type `multi_modality` but Transformers does not recognize this architecture. This could be because of an issue with the checkpoint, or because your version of Transformers is out of date.
+
+You can update Transformers with the command `pip install --upgrade transformers`. If this does not work, and the checkpoint is very new, then there may not be a release version that supports this model yet. In this case, you can get the most up-to-date code by installing Transformers from source with the command `pip install git+https://github.com/huggingface/transformers.git`
+2026-11-13 12:04:41,602 - __main__ - INFO - Script run complete
+2026-11-13 12:05:13,974 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 12:05:13,984 - __main__ - INFO - GPU is available.
+2026-11-13 12:05:13,985 - __main__ - INFO - Script called
+2026-11-13 12:05:13,986 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='deepseek-ai/DeepSeek-V3.2', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 12:05:13,986 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 12:05:13,986 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 12:05:13,987 - __main__ - INFO - Specified country: None
+2026-11-13 12:05:13,987 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 12:26:32,369 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 12:26:32,388 - __main__ - INFO - GPU is available.
+2026-11-13 12:26:32,390 - __main__ - INFO - Script called
+2026-11-13 12:26:32,391 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='Qwen/Qwen3-14B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 12:26:32,391 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 12:26:32,392 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 12:26:32,392 - __main__ - INFO - Specified country: None
+2026-11-13 12:26:32,392 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 12:34:54,815 - filter - ERROR - Filtering failed: Could not load model Qwen/Qwen3-14B with any of the following classes: (<class 'transformers.models.auto.modeling_auto.AutoModelForCausalLM'>, <class 'transformers.models.qwen3.modeling_qwen3.Qwen3ForCausalLM'>). See the original errors:
+
+while loading with AutoModelForCausalLM, an error is thrown:
+Traceback (most recent call last):
+  File "/home/eddie/.local/lib/python3.10/site-packages/transformers/pipelines/base.py", line 241, in load_model
+    model = model_class.from_pretrained(model, **kwargs)
+  File "/home/eddie/.local/lib/python3.10/site-packages/transformers/models/auto/auto_factory.py", line 411, in from_pretrained
+    return model_class.from_pretrained(
+  File "/home/eddie/.local/lib/python3.10/site-packages/transformers/modeling_utils.py", line 4251, in from_pretrained
+    checkpoint_files, sharded_metadata = _get_resolved_checkpoint_files(
+  File "/home/eddie/.local/lib/python3.10/site-packages/transformers/modeling_utils.py", line 791, in _get_resolved_checkpoint_files
+    checkpoint_files, sharded_metadata = get_checkpoint_shard_files(
+  File "/home/eddie/.local/lib/python3.10/site-packages/transformers/utils/hub.py", line 980, in get_checkpoint_shard_files
+    cached_filenames = cached_files(
+  File "/home/eddie/.local/lib/python3.10/site-packages/transformers/utils/hub.py", line 634, in cached_files
+    raise e
+  File "/home/eddie/.local/lib/python3.10/site-packages/transformers/utils/hub.py", line 552, in cached_files
+    snapshot_download(
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/utils/_validators.py", line 89, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/utils/_http.py", line 276, in _inner
+    return fn(*args, **kwargs)
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/_snapshot_download.py", line 541, in snapshot_download
+    hf_thread_map(
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/utils/tqdm.py", line 441, in hf_thread_map
+    results[future_to_index[future]] = future.result()
+  File "/usr/lib/python3.10/concurrent/futures/_base.py", line 451, in result
+    return self.__get_result()
+  File "/usr/lib/python3.10/concurrent/futures/_base.py", line 403, in __get_result
+    raise self._exception
+  File "/usr/lib/python3.10/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/_snapshot_download.py", line 521, in _inner_hf_hub_download
+    hf_hub_download(  # type: ignore
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/utils/_validators.py", line 89, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/utils/_http.py", line 276, in _inner
+    return fn(*args, **kwargs)
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 1047, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 1285, in _hf_hub_download_to_cache_dir
+    _download_to_tmp_and_move(
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 2017, in _download_to_tmp_and_move
+    xet_get(
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 589, in xet_get
+    with session.new_file_download_group(
+RuntimeError: Task error: File reconstruction error: Internal Writer Error: Background writer channel closed
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/eddie/.local/lib/python3.10/site-packages/transformers/pipelines/base.py", line 257, in load_model
+    model = model_class.from_pretrained(model, **fp32_kwargs)
+  File "/home/eddie/.local/lib/python3.10/site-packages/transformers/models/auto/auto_factory.py", line 411, in from_pretrained
+    return model_class.from_pretrained(
+  File "/home/eddie/.local/lib/python3.10/site-packages/transformers/modeling_utils.py", line 4251, in from_pretrained
+    checkpoint_files, sharded_metadata = _get_resolved_checkpoint_files(
+  File "/home/eddie/.local/lib/python3.10/site-packages/transformers/modeling_utils.py", line 791, in _get_resolved_checkpoint_files
+    checkpoint_files, sharded_metadata = get_checkpoint_shard_files(
+  File "/home/eddie/.local/lib/python3.10/site-packages/transformers/utils/hub.py", line 980, in get_checkpoint_shard_files
+    cached_filenames = cached_files(
+  File "/home/eddie/.local/lib/python3.10/site-packages/transformers/utils/hub.py", line 634, in cached_files
+    raise e
+  File "/home/eddie/.local/lib/python3.10/site-packages/transformers/utils/hub.py", line 552, in cached_files
+    snapshot_download(
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/utils/_validators.py", line 89, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/utils/_http.py", line 276, in _inner
+    return fn(*args, **kwargs)
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/_snapshot_download.py", line 541, in snapshot_download
+    hf_thread_map(
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/utils/tqdm.py", line 441, in hf_thread_map
+    results[future_to_index[future]] = future.result()
+  File "/usr/lib/python3.10/concurrent/futures/_base.py", line 451, in result
+    return self.__get_result()
+  File "/usr/lib/python3.10/concurrent/futures/_base.py", line 403, in __get_result
+    raise self._exception
+  File "/usr/lib/python3.10/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/_snapshot_download.py", line 521, in _inner_hf_hub_download
+    hf_hub_download(  # type: ignore
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/utils/_validators.py", line 89, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/utils/_http.py", line 276, in _inner
+    return fn(*args, **kwargs)
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 1047, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 1285, in _hf_hub_download_to_cache_dir
+    _download_to_tmp_and_move(
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 2017, in _download_to_tmp_and_move
+    xet_get(
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 589, in xet_get
+    with session.new_file_download_group(
+RuntimeError: Task error: File reconstruction error: IO Error: No space left on device (os error 28)
+
+while loading with Qwen3ForCausalLM, an error is thrown:
+Traceback (most recent call last):
+  File "/home/eddie/.local/lib/python3.10/site-packages/transformers/pipelines/base.py", line 241, in load_model
+    model = model_class.from_pretrained(model, **kwargs)
+  File "/home/eddie/.local/lib/python3.10/site-packages/transformers/modeling_utils.py", line 4251, in from_pretrained
+    checkpoint_files, sharded_metadata = _get_resolved_checkpoint_files(
+  File "/home/eddie/.local/lib/python3.10/site-packages/transformers/modeling_utils.py", line 791, in _get_resolved_checkpoint_files
+    checkpoint_files, sharded_metadata = get_checkpoint_shard_files(
+  File "/home/eddie/.local/lib/python3.10/site-packages/transformers/utils/hub.py", line 980, in get_checkpoint_shard_files
+    cached_filenames = cached_files(
+  File "/home/eddie/.local/lib/python3.10/site-packages/transformers/utils/hub.py", line 634, in cached_files
+    raise e
+  File "/home/eddie/.local/lib/python3.10/site-packages/transformers/utils/hub.py", line 552, in cached_files
+    snapshot_download(
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/utils/_validators.py", line 89, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/utils/_http.py", line 276, in _inner
+    return fn(*args, **kwargs)
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/_snapshot_download.py", line 541, in snapshot_download
+    hf_thread_map(
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/utils/tqdm.py", line 441, in hf_thread_map
+    results[future_to_index[future]] = future.result()
+  File "/usr/lib/python3.10/concurrent/futures/_base.py", line 451, in result
+    return self.__get_result()
+  File "/usr/lib/python3.10/concurrent/futures/_base.py", line 403, in __get_result
+    raise self._exception
+  File "/usr/lib/python3.10/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/_snapshot_download.py", line 521, in _inner_hf_hub_download
+    hf_hub_download(  # type: ignore
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/utils/_validators.py", line 89, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/utils/_http.py", line 276, in _inner
+    return fn(*args, **kwargs)
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 1047, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 1285, in _hf_hub_download_to_cache_dir
+    _download_to_tmp_and_move(
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 2017, in _download_to_tmp_and_move
+    xet_get(
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 589, in xet_get
+    with session.new_file_download_group(
+RuntimeError: Task error: File reconstruction error: IO Error: No space left on device (os error 28)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/eddie/.local/lib/python3.10/site-packages/transformers/pipelines/base.py", line 257, in load_model
+    model = model_class.from_pretrained(model, **fp32_kwargs)
+  File "/home/eddie/.local/lib/python3.10/site-packages/transformers/modeling_utils.py", line 4251, in from_pretrained
+    checkpoint_files, sharded_metadata = _get_resolved_checkpoint_files(
+  File "/home/eddie/.local/lib/python3.10/site-packages/transformers/modeling_utils.py", line 791, in _get_resolved_checkpoint_files
+    checkpoint_files, sharded_metadata = get_checkpoint_shard_files(
+  File "/home/eddie/.local/lib/python3.10/site-packages/transformers/utils/hub.py", line 980, in get_checkpoint_shard_files
+    cached_filenames = cached_files(
+  File "/home/eddie/.local/lib/python3.10/site-packages/transformers/utils/hub.py", line 634, in cached_files
+    raise e
+  File "/home/eddie/.local/lib/python3.10/site-packages/transformers/utils/hub.py", line 552, in cached_files
+    snapshot_download(
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/utils/_validators.py", line 89, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/utils/_http.py", line 276, in _inner
+    return fn(*args, **kwargs)
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/_snapshot_download.py", line 541, in snapshot_download
+    hf_thread_map(
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/utils/tqdm.py", line 441, in hf_thread_map
+    results[future_to_index[future]] = future.result()
+  File "/usr/lib/python3.10/concurrent/futures/_base.py", line 451, in result
+    return self.__get_result()
+  File "/usr/lib/python3.10/concurrent/futures/_base.py", line 403, in __get_result
+    raise self._exception
+  File "/usr/lib/python3.10/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/_snapshot_download.py", line 521, in _inner_hf_hub_download
+    hf_hub_download(  # type: ignore
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/utils/_validators.py", line 89, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/utils/_http.py", line 276, in _inner
+    return fn(*args, **kwargs)
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 1047, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 1285, in _hf_hub_download_to_cache_dir
+    _download_to_tmp_and_move(
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 2017, in _download_to_tmp_and_move
+    xet_get(
+  File "/home/eddie/.local/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 589, in xet_get
+    with session.new_file_download_group(
+RuntimeError: Task error: File reconstruction error: Internal Writer Error: Background writer channel closed
+
+
+
+2026-11-13 12:34:54,817 - __main__ - INFO - Script run complete
+2026-11-13 12:50:10,809 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 12:50:10,816 - __main__ - INFO - GPU is available.
+2026-11-13 12:50:10,817 - __main__ - INFO - Script called
+2026-11-13 12:50:10,818 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='Qwen/Qwen3-14B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 12:50:10,818 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 12:50:10,818 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 12:50:10,818 - __main__ - INFO - Specified country: None
+2026-11-13 12:50:10,818 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 13:19:55,419 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 13:19:55,427 - __main__ - INFO - GPU is available.
+2026-11-13 13:19:55,428 - __main__ - INFO - Script called
+2026-11-13 13:19:55,429 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='Qwen/Qwen3-1.7B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 13:19:55,429 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 13:19:55,429 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 13:19:55,429 - __main__ - INFO - Specified country: None
+2026-11-13 13:19:55,429 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 13:20:41,483 - filter - INFO - Final checkpoint saved at index 2. Total matches: 0
+2026-11-13 13:39:37,892 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 13:39:37,900 - __main__ - INFO - GPU is available.
+2026-11-13 13:39:37,901 - __main__ - INFO - Script called
+2026-11-13 13:39:37,902 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='Qwen/Qwen3-1.7B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 13:39:37,902 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 13:39:37,902 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 13:39:37,902 - __main__ - INFO - Specified country: None
+2026-11-13 13:39:37,902 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 13:39:50,699 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': "The conversation appears to be about a fictional concept called 'reality shifting' and does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship."}
+2026-11-13 13:39:50,700 - filter - ERROR - Invalid response for record c9ec5b440fbdd2a269333dd241f32f64. Response: {'IssuesRelated': False, 'Reasoning': "The conversation appears to be about a fictional concept called 'reality shifting' and does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship."}
+2026-11-13 13:39:50,731 - filter - INFO - Final checkpoint saved at index 2. Total matches: 0
+2026-11-13 15:34:00,150 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 15:34:00,164 - __main__ - INFO - GPU is available.
+2026-11-13 15:34:00,166 - __main__ - INFO - Script called
+2026-11-13 15:34:00,167 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='Qwen/Qwen3-1.7B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 15:34:00,167 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 15:34:00,168 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 15:34:00,168 - __main__ - INFO - Specified country: None
+2026-11-13 15:34:00,168 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 15:34:13,685 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': "The conversation appears to be about a fictional concept called 'reality shifting' and does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship."}
+2026-11-13 15:34:13,685 - filter - ERROR - Invalid response for record c9ec5b440fbdd2a269333dd241f32f64. Response: {'IssuesRelated': False, 'Reasoning': "The conversation appears to be about a fictional concept called 'reality shifting' and does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship."}
+2026-11-13 15:34:13,714 - filter - INFO - Final checkpoint saved at index 2. Total matches: 0
+2026-11-13 15:41:14,373 - __main__ - INFO - ===== Starting Search Script. =====
+2026-11-13 15:41:14,384 - __main__ - INFO - GPU is available.
+2026-11-13 15:41:14,386 - __main__ - INFO - Script called
+2026-11-13 15:41:14,387 - root - INFO - Parsed arguments: Namespace(steps=['filter'], output_dir=None, search_output_file=None, template_set='AIPV_TEMPLATES', test_regex=False, dataset='wildchat', country=None, data_limit=None, search_turn_len_limit=8000, search_conv_turn_limit=None, resume_search=False, test_input_file=None, filter_output_file=None, filter_model='Qwen/Qwen3-1.7B', filter_data_limit=100, filter_turn_len_limit=100, filter_conv_turn_limit=None, resume_filter=False)
+2026-11-13 15:41:14,387 - utils - INFO - Loaded public environment variables from .env.public: OrderedDict()
+2026-11-13 15:41:14,388 - utils - INFO - Loaded private environment variables from .env.private
+2026-11-13 15:41:14,388 - __main__ - INFO - Specified country: None
+2026-11-13 15:41:14,388 - __main__ - INFO - Filtering all conversations for relevancy using an LLM
+2026-11-13 15:41:27,545 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': "The conversation appears to be about a fictional concept called 'reality shifting' and does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship."}
+2026-11-13 15:41:27,546 - filter - ERROR - Invalid response for record c9ec5b440fbdd2a269333dd241f32f64. Response: {'IssuesRelated': False, 'Reasoning': "The conversation appears to be about a fictional concept called 'reality shifting' and does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship."}
+2026-11-13 15:41:30,568 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about a medical condition (myocardial infarction) and does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:41:30,568 - filter - ERROR - Invalid response for record cf1267ca6b2f6fccc9c36652a00059a1. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about a medical condition (myocardial infarction) and does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:41:33,533 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation involves a request for a synopsis by an assistant, with no mention of romantic relationships, conflicts, or issues. The content is purely about creating a fictional story.'}
+2026-11-13 15:41:33,533 - filter - ERROR - Invalid response for record 72b6aa90f180f51aa1301b42484c9196. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation involves a request for a synopsis by an assistant, with no mention of romantic relationships, conflicts, or issues. The content is purely about creating a fictional story.'}
+2026-11-13 15:41:36,690 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': "The conversation appears to be about a fictional concept called 'reality shifting' and a hypothetical destination, which does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship."}
+2026-11-13 15:41:36,691 - filter - ERROR - Invalid response for record e98d3e74c57f9a65261df393d9124ac2. Response: {'IssuesRelated': False, 'Reasoning': "The conversation appears to be about a fictional concept called 'reality shifting' and a hypothetical destination, which does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship."}
+2026-11-13 15:41:40,050 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation involves a discussion about reality shifting and a destination idea, but there is no mention of romantic relationship issues, conflicts, or problems. The content is focused on a hypothetical adventure and does not relate to romantic relations.'}
+2026-11-13 15:41:40,050 - filter - ERROR - Invalid response for record 2e8fd255aab694b07a0be8d83cb53a7b. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation involves a discussion about reality shifting and a destination idea, but there is no mention of romantic relationship issues, conflicts, or problems. The content is focused on a hypothetical adventure and does not relate to romantic relations.'}
+2026-11-13 15:41:42,963 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation involves a user requesting AI to create legal documents, which is outside the scope of romantic relationship issues. The assistant correctly explains that it cannot create legal documents.'}
+2026-11-13 15:41:42,963 - filter - ERROR - Invalid response for record 59c72510f3143025f94f75b883b026bd. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation involves a user requesting AI to create legal documents, which is outside the scope of romantic relationship issues. The assistant correctly explains that it cannot create legal documents.'}
+2026-11-13 15:41:45,928 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': "The conversation appears to be about a fictional concept called 'reality shifting' and does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship."}
+2026-11-13 15:41:45,928 - filter - ERROR - Invalid response for record a46dca428c5be27147ab40a54ed348f8. Response: {'IssuesRelated': False, 'Reasoning': "The conversation appears to be about a fictional concept called 'reality shifting' and does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship."}
+2026-11-13 15:41:48,877 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': "The conversation appears to be about a fictional concept called 'reality shifting' and does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship."}
+2026-11-13 15:41:48,877 - filter - ERROR - Invalid response for record e18230f1108ee437a21162f2539ac8bf. Response: {'IssuesRelated': False, 'Reasoning': "The conversation appears to be about a fictional concept called 'reality shifting' and does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship."}
+2026-11-13 15:41:52,360 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': "The conversation involves a request from the user to the assistant to generate a synopsis for a fictional story, which is unrelated to romantic relationship issues. The assistant's response is a fictional story synopsis, not discussing any romantic relationship problems or conflicts."}
+2026-11-13 15:41:52,361 - filter - ERROR - Invalid response for record ea99a6a4cebf14d91e885c1ae40c8e9c. Response: {'IssuesRelated': False, 'Reasoning': "The conversation involves a request from the user to the assistant to generate a synopsis for a fictional story, which is unrelated to romantic relationship issues. The assistant's response is a fictional story synopsis, not discussing any romantic relationship problems or conflicts."}
+2026-11-13 15:41:57,890 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation primarily involves discussing movies from 2011 and 2022, and the assistant is explaining the status of movies for 2022. There is no mention of romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:41:57,890 - filter - ERROR - Invalid response for record 58653738f84f20b0480c00cddd8896e2. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation primarily involves discussing movies from 2011 and 2022, and the assistant is explaining the status of movies for 2022. There is no mention of romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:42:00,961 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about discussing game content creation, specifically boss fights for a third-person action game. There is no mention of romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:42:00,961 - filter - ERROR - Invalid response for record 4b8016c129dfae2f09d646059c8496b7. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about discussing game content creation, specifically boss fights for a third-person action game. There is no mention of romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:42:03,758 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about creating boss fights for a video game and does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:42:03,758 - filter - ERROR - Invalid response for record 0a342f2a33d8486f338dbc3881323da3. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about creating boss fights for a video game and does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:42:06,887 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about creating a moveset for a tactical stealth game, which is a game-related topic. There is no mention of romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:42:06,887 - filter - ERROR - Invalid response for record e8481c51c544ae7a94c248505d0b3413. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about creating a moveset for a tactical stealth game, which is a game-related topic. There is no mention of romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:42:10,143 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation involves a request for a synopsis from an assistant, which is unrelated to romantic relationship issues. The content is about writing a synopsis for a story, not discussing conflicts or problems in a romantic relationship.'}
+2026-11-13 15:42:10,143 - filter - ERROR - Invalid response for record e5ae2bd36c32b4b3b2b8cb7a918f0c49. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation involves a request for a synopsis from an assistant, which is unrelated to romantic relationship issues. The content is about writing a synopsis for a story, not discussing conflicts or problems in a romantic relationship.'}
+2026-11-13 15:42:13,617 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation contains a story prompt and a response from an assistant, but there is no discussion about romantic relationships, conflicts, or issues within a romantic relationship. The content is related to writing a story, not discussing romantic issues.'}
+2026-11-13 15:42:13,618 - filter - ERROR - Invalid response for record 51388bfe9b38790fe83a9f15053c1a0d. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation contains a story prompt and a response from an assistant, but there is no discussion about romantic relationships, conflicts, or issues within a romantic relationship. The content is related to writing a story, not discussing romantic issues.'}
+2026-11-13 15:42:23,512 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation contains multiple mathematical and statistical problems related to probability and finance, but there is no discussion of romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:42:23,512 - filter - ERROR - Invalid response for record aa7c3f49343e097be66442288abd1dac. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation contains multiple mathematical and statistical problems related to probability and finance, but there is no discussion of romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:42:26,447 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about asking for free apps to create MIDI files or sheet music from MP3 files. This is a technical inquiry and does not involve romantic relationship issues.'}
+2026-11-13 15:42:26,447 - filter - ERROR - Invalid response for record 490344da63f175fb4628661808267ea8. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about asking for free apps to create MIDI files or sheet music from MP3 files. This is a technical inquiry and does not involve romantic relationship issues.'}
+2026-11-13 15:42:29,085 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': True, 'Reasoning': 'The conversation involves a discussion about a romantic relationship (femdom) and potential conflicts, which are relevant to romantic relationship issues.'}
+2026-11-13 15:42:29,085 - filter - ERROR - Invalid response for record 38e880c7566e35e9e234bc77f5cef2ba. Response: {'IssuesRelated': True, 'Reasoning': 'The conversation involves a discussion about a romantic relationship (femdom) and potential conflicts, which are relevant to romantic relationship issues.'}
+2026-11-13 15:42:32,706 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': True, 'Reasoning': "The conversation contains a description of a specific type of relationship dynamic (femdom) and may imply potential conflicts or disagreements within a romantic relationship. The assistant's response suggests a discussion about a specific relationship dynamic, which could relate to romantic relationship issues."}
+2026-11-13 15:42:32,706 - filter - ERROR - Invalid response for record e9dd7859722e26f2503bc4b5fb3ca104. Response: {'IssuesRelated': True, 'Reasoning': "The conversation contains a description of a specific type of relationship dynamic (femdom) and may imply potential conflicts or disagreements within a romantic relationship. The assistant's response suggests a discussion about a specific relationship dynamic, which could relate to romantic relationship issues."}
+2026-11-13 15:42:36,580 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': True, 'Reasoning': "The conversation contains a mention of a 'cute and kinky girl femdom' which is related to romantic relationships and may involve discussions about power dynamics and expectations within a relationship. The assistant's response also discusses the nature of such relationships, indicating it is relevant to romantic relationship issues."}
+2026-11-13 15:42:36,581 - filter - ERROR - Invalid response for record 9ecc927d50ff828717dc98e8d5e61aa4. Response: {'IssuesRelated': True, 'Reasoning': "The conversation contains a mention of a 'cute and kinky girl femdom' which is related to romantic relationships and may involve discussions about power dynamics and expectations within a relationship. The assistant's response also discusses the nature of such relationships, indicating it is relevant to romantic relationship issues."}
+2026-11-13 15:42:46,979 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': True, 'Reasoning': "The conversation involves the assistant generating lines for GoT characters in a speculative scenario where they are assimilated by the Borg and the ret. The assistant is responding to the user's request to make the lines more subtle, emotional, and fitting for each character. The discussion includes specific character responses and the assistant's suggestions for improvement, which are related to romantic relationship issues such as conflict, disagreement, and character development."}
+2026-11-13 15:42:46,979 - filter - ERROR - Invalid response for record aaa6493a85ec987f39fc0f03877791c2. Response: {'IssuesRelated': True, 'Reasoning': "The conversation involves the assistant generating lines for GoT characters in a speculative scenario where they are assimilated by the Borg and the ret. The assistant is responding to the user's request to make the lines more subtle, emotional, and fitting for each character. The discussion includes specific character responses and the assistant's suggestions for improvement, which are related to romantic relationship issues such as conflict, disagreement, and character development."}
+2026-11-13 15:42:49,974 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about how to spoof foot fingerprints and mask footprints, which is unrelated to romantic relationship issues. The content is technical and related to cybersecurity or digital privacy.'}
+2026-11-13 15:42:49,974 - filter - ERROR - Invalid response for record bb125f3656010a24034b55a131a61f73. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about how to spoof foot fingerprints and mask footprints, which is unrelated to romantic relationship issues. The content is technical and related to cybersecurity or digital privacy.'}
+2026-11-13 15:42:54,112 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about scientific questions regarding orbital mechanics and running in a circle, which are not related to romantic relationship issues.'}
+2026-11-13 15:42:54,112 - filter - ERROR - Invalid response for record 576e59afd66835b3797517cd1cd8a08b. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about scientific questions regarding orbital mechanics and running in a circle, which are not related to romantic relationship issues.'}
+2026-11-13 15:42:57,539 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation involves a fictional story about Xenia Onatopp and James Bond, which is not related to romantic relationship issues. The content is purely creative and does not discuss conflicts, disagreements, or problems within a romantic relationship.'}
+2026-11-13 15:42:57,540 - filter - ERROR - Invalid response for record df8e4d471ae43b785fd2b24072360bcf. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation involves a fictional story about Xenia Onatopp and James Bond, which is not related to romantic relationship issues. The content is purely creative and does not discuss conflicts, disagreements, or problems within a romantic relationship.'}
+2026-11-13 15:43:02,817 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation appears to be a typical interaction between a user and an assistant, with no indication of romantic relationship issues, conflicts, or problems. The content is neutral and lacks any discussion about romantic relations.'}
+2026-11-13 15:43:02,818 - filter - ERROR - Invalid response for record 94e4291a6e14137c52e57fb86548e91f. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation appears to be a typical interaction between a user and an assistant, with no indication of romantic relationship issues, conflicts, or problems. The content is neutral and lacks any discussion about romantic relations.'}
+2026-11-13 15:43:09,501 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about creating a story involving a teenage girl swapping bodies with a serial killer, but there is no discussion of romantic relationships, conflicts, or issues within a romantic relationship. The content is purely fictional and unrelated to romantic relationship issues.'}
+2026-11-13 15:43:09,501 - filter - ERROR - Invalid response for record 524a0f447d21bc8dfd958ce8f307030e. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about creating a story involving a teenage girl swapping bodies with a serial killer, but there is no discussion of romantic relationships, conflicts, or issues within a romantic relationship. The content is purely fictional and unrelated to romantic relationship issues.'}
+2026-11-13 15:43:11,874 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about creating a TV advertisement for a game character, not discussing romantic relationship issues.'}
+2026-11-13 15:43:11,874 - filter - ERROR - Invalid response for record c9119ee42a594d5f5fa813b80e5c9352. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about creating a TV advertisement for a game character, not discussing romantic relationship issues.'}
+2026-11-13 15:43:15,105 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about writing an advertisement for a Rathian in the context of the Monster Hunter series. It does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:43:15,105 - filter - ERROR - Invalid response for record 4571c37e863f1f5f0b5099180443eae8. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about writing an advertisement for a Rathian in the context of the Monster Hunter series. It does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:43:19,325 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': True, 'Reasoning': "The conversation involves Gendry expressing regrets for leaving Arya in the king's room, which suggests a romantic relationship issue. The assistant is responding to Gendry's speech, indicating a potential conflict or emotional discussion."}
+2026-11-13 15:43:19,326 - filter - ERROR - Invalid response for record bac147235b8a766c1155b65376ce3fb2. Response: {'IssuesRelated': True, 'Reasoning': "The conversation involves Gendry expressing regrets for leaving Arya in the king's room, which suggests a romantic relationship issue. The assistant is responding to Gendry's speech, indicating a potential conflict or emotional discussion."}
+2026-11-13 15:43:23,106 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about data storage and backup strategies, not romantic relationship issues.'}
+2026-11-13 15:43:23,106 - filter - ERROR - Invalid response for record 3ae27f2a38590dcb18027cf906e680c9. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about data storage and backup strategies, not romantic relationship issues.'}
+2026-11-13 15:43:26,439 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation contains a 4chan post discussing a crossover event involving Vegeta and Saiyan culture, but it does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:43:26,439 - filter - ERROR - Invalid response for record ffaff7e7e2f711934824ff7974add1db. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation contains a 4chan post discussing a crossover event involving Vegeta and Saiyan culture, but it does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:43:29,785 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about the capabilities and features of an AI language model, not about romantic relationships or issues within a romantic relationship.'}
+2026-11-13 15:43:29,785 - filter - ERROR - Invalid response for record 885a2bda3e5cf16f9e52e10b22253565. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about the capabilities and features of an AI language model, not about romantic relationships or issues within a romantic relationship.'}
+2026-11-13 15:43:36,099 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation contains discussions about film comparisons, torture methods, burns, and friction burns. However, none of these topics relate to romantic relationship issues such as conflicts, disagreements, or problems within a romantic relationship.'}
+2026-11-13 15:43:36,099 - filter - ERROR - Invalid response for record 8cc7d028ee95fb77d6f64f2cbcb4b878. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation contains discussions about film comparisons, torture methods, burns, and friction burns. However, none of these topics relate to romantic relationship issues such as conflicts, disagreements, or problems within a romantic relationship.'}
+2026-11-13 15:43:41,508 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': "The conversation appears to be about a fictional narrative involving a casino and a character's experience, with no mention of romantic relationships, conflicts, or issues related to romantic relations."}
+2026-11-13 15:43:41,508 - filter - ERROR - Invalid response for record 920e334e72831962ebc64f6d490fa550. Response: {'IssuesRelated': False, 'Reasoning': "The conversation appears to be about a fictional narrative involving a casino and a character's experience, with no mention of romantic relationships, conflicts, or issues related to romantic relations."}
+2026-11-13 15:43:47,437 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': True, 'Reasoning': "The conversation involves a user discussing a character named Christian Vaughn, who is described as a CIA Agent with traits similar to James Bond, John Wick, and Nathan Drake. This is a discussion about a character's traits and role, which is not directly related to romantic relationship issues. However, the mention of a character and their traits could be interpreted as a discussion about romantic relationships if the context is assumed to be about a relationship. The content is ambiguous and does not clearly indicate a romantic relationship issue."}
+2026-11-13 15:43:47,438 - filter - ERROR - Invalid response for record f5da29bb2dd21f031af2408cc224fbae. Response: {'IssuesRelated': True, 'Reasoning': "The conversation involves a user discussing a character named Christian Vaughn, who is described as a CIA Agent with traits similar to James Bond, John Wick, and Nathan Drake. This is a discussion about a character's traits and role, which is not directly related to romantic relationship issues. However, the mention of a character and their traits could be interpreted as a discussion about romantic relationships if the context is assumed to be about a relationship. The content is ambiguous and does not clearly indicate a romantic relationship issue."}
+2026-11-13 15:43:52,714 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': "The conversation is about a blog post on Trump's indictment and related facts, but there is no discussion of romantic relationship issues, conflicts, or problems within a romantic relationship."}
+2026-11-13 15:43:52,714 - filter - ERROR - Invalid response for record 034d3607cf21cbc378e76b65f597d5a9. Response: {'IssuesRelated': False, 'Reasoning': "The conversation is about a blog post on Trump's indictment and related facts, but there is no discussion of romantic relationship issues, conflicts, or problems within a romantic relationship."}
+2026-11-13 15:44:01,050 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': "The conversation involves a user asking for a children's book and a thriller book, but there is no mention of romantic relationships, conflicts, or issues within a relationship. The content is focused on book requests and AI responses."}
+2026-11-13 15:44:01,050 - filter - ERROR - Invalid response for record ce1f43df9da39f6f0000db22fe1181d9. Response: {'IssuesRelated': False, 'Reasoning': "The conversation involves a user asking for a children's book and a thriller book, but there is no mention of romantic relationships, conflicts, or issues within a relationship. The content is focused on book requests and AI responses."}
+2026-11-13 15:44:10,461 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about technical specifications and configurations related to a NAS system, specifically TrueNAS Scale. It does not involve conflicts, disagreements, or problems within a romantic relationship.'}
+2026-11-13 15:44:10,462 - filter - ERROR - Invalid response for record 49f2df1f57031159e37e648404f84d0b. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about technical specifications and configurations related to a NAS system, specifically TrueNAS Scale. It does not involve conflicts, disagreements, or problems within a romantic relationship.'}
+2026-11-13 15:44:15,029 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation appears to be about casting ideas for a character in a fictional scenario, with no mention of romantic relationships, conflicts, or issues. The content is focused on creative and production-related topics.'}
+2026-11-13 15:44:15,029 - filter - ERROR - Invalid response for record b5610e7455f3ffa0ca6680ce991eeebf. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation appears to be about casting ideas for a character in a fictional scenario, with no mention of romantic relationships, conflicts, or issues. The content is focused on creative and production-related topics.'}
+2026-11-13 15:44:18,476 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about designing a disk topology for a NAS system and a dataset layout, which is a technical and engineering discussion. It does not involve any romantic relationship issues, conflicts, or emotional topics.'}
+2026-11-13 15:44:18,476 - filter - ERROR - Invalid response for record 2d1ccd5a3c4c302f7bfafe4d02ba3ea5. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about designing a disk topology for a NAS system and a dataset layout, which is a technical and engineering discussion. It does not involve any romantic relationship issues, conflicts, or emotional topics.'}
+2026-11-13 15:44:21,097 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': "The conversation discusses a fictional character's power and its effects, which is unrelated to romantic relationships or their issues."}
+2026-11-13 15:44:21,097 - filter - ERROR - Invalid response for record ded396aaf9e4f0ea81ad6cbfd837b37c. Response: {'IssuesRelated': False, 'Reasoning': "The conversation discusses a fictional character's power and its effects, which is unrelated to romantic relationships or their issues."}
+2026-11-13 15:44:24,613 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about technical aspects of a NAS system and disk topology design, not involving romantic relationship issues.'}
+2026-11-13 15:44:24,613 - filter - ERROR - Invalid response for record ba50d8a497372565f16740a0c7621b80. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about technical aspects of a NAS system and disk topology design, not involving romantic relationship issues.'}
+2026-11-13 15:44:27,758 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation contains a reference to a movie and a description of a scene, but there is no discussion of romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:44:27,758 - filter - ERROR - Invalid response for record baf35a070f72a89e00460079eec5ba73. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation contains a reference to a movie and a description of a scene, but there is no discussion of romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:44:30,241 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about an error encountered during web automation, not related to romantic relationships.'}
+2026-11-13 15:44:30,241 - filter - ERROR - Invalid response for record 0fff51c4307e569be97a912d71e0d44c. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about an error encountered during web automation, not related to romantic relationships.'}
+2026-11-13 15:44:33,546 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about providing code for a volleyball game mode in Lua for FiveM. It does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:44:33,546 - filter - ERROR - Invalid response for record b011e7bf368247359b5daafa84961522. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about providing code for a volleyball game mode in Lua for FiveM. It does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:44:36,815 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about requesting an Android application development task, which is unrelated to romantic relationship issues. The discussion does not involve conflicts, disagreements, or problems within a romantic relationship.'}
+2026-11-13 15:44:36,815 - filter - ERROR - Invalid response for record 1a389a1be36dd540c37bd5796f35347d. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about requesting an Android application development task, which is unrelated to romantic relationship issues. The discussion does not involve conflicts, disagreements, or problems within a romantic relationship.'}
+2026-11-13 15:44:41,936 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about creating a story and dialogue related to a fictional event and characters, not discussing any actual romantic relationship issues.'}
+2026-11-13 15:44:41,936 - filter - ERROR - Invalid response for record 2bcddb7c5cf05e83e0341732a1361857. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about creating a story and dialogue related to a fictional event and characters, not discussing any actual romantic relationship issues.'}
+2026-11-13 15:44:45,343 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation contains a detailed story prompt about Leon S. Kennedy in the Resident Evil universe, but it does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:44:45,344 - filter - ERROR - Invalid response for record c1c5978404c512be43660f2b17ccf8e9. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation contains a detailed story prompt about Leon S. Kennedy in the Resident Evil universe, but it does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:44:52,906 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about Roblox scripting and technical questions related to game development, not romantic relationship issues.'}
+2026-11-13 15:44:52,906 - filter - ERROR - Invalid response for record d47b04806711b551403671021a72f8bf. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about Roblox scripting and technical questions related to game development, not romantic relationship issues.'}
+2026-11-13 15:44:59,933 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation appears to be about math problems and phone passcode guessing, which are unrelated to romantic relationship issues. There is no mention of conflicts, disagreements, or problems within a romantic relationship.'}
+2026-11-13 15:44:59,933 - filter - ERROR - Invalid response for record d257adf7aa7439c7a84e9a2b4665b580. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation appears to be about math problems and phone passcode guessing, which are unrelated to romantic relationship issues. There is no mention of conflicts, disagreements, or problems within a romantic relationship.'}
+2026-11-13 15:45:03,969 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': True, 'Reasoning': 'The conversation includes a discussion about the impact of cyber technology on marketing and advertising, which could relate to romantic relationship issues if the context were to involve conflicts or problems within a relationship. However, the content provided is purely academic and does not indicate any romantic relationship issues.'}
+2026-11-13 15:45:03,969 - filter - ERROR - Invalid response for record 6e76ca5898dd3052ceccdcd5ef7f4970. Response: {'IssuesRelated': True, 'Reasoning': 'The conversation includes a discussion about the impact of cyber technology on marketing and advertising, which could relate to romantic relationship issues if the context were to involve conflicts or problems within a relationship. However, the content provided is purely academic and does not indicate any romantic relationship issues.'}
+2026-11-13 15:45:07,183 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation contains a request for a story in the John Wick universe, but it does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:45:07,184 - filter - ERROR - Invalid response for record 316ac4845f4c86d6293501b2c4a1eb66. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation contains a request for a story in the John Wick universe, but it does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:45:10,319 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is a simple question about the nature of AI models and does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:45:10,319 - filter - ERROR - Invalid response for record 5a928273d7ab20b5c05fff0f42962a2e. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is a simple question about the nature of AI models and does not involve any discussion of romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:45:13,489 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation appears to be about the transformation of commerce and advertising through cyber-technology, which is a general topic and not related to specific issues within a romantic relationship.'}
+2026-11-13 15:45:13,489 - filter - ERROR - Invalid response for record f6adcebf83bb256210eadd75d0eb41ff. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation appears to be about the transformation of commerce and advertising through cyber-technology, which is a general topic and not related to specific issues within a romantic relationship.'}
+2026-11-13 15:45:20,700 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about technical capabilities of the AI model and does not involve any romantic relationship issues.'}
+2026-11-13 15:45:20,701 - filter - ERROR - Invalid response for record 8cd3a500d1d3a4f873587e60c85e0fd2. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about technical capabilities of the AI model and does not involve any romantic relationship issues.'}
+2026-11-13 15:45:23,148 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about coding and AI functions, not romantic relationship issues.'}
+2026-11-13 15:45:23,148 - filter - ERROR - Invalid response for record a155eed3919638107a2dd6a0ad0131cc. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about coding and AI functions, not romantic relationship issues.'}
+2026-11-13 15:45:28,452 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about designing a disk topology for a NAS system and does not involve any conflicts, disagreements, or problems within a romantic relationship.'}
+2026-11-13 15:45:28,452 - filter - ERROR - Invalid response for record beba14d11b0bbb83dc2491d905fa0c90. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about designing a disk topology for a NAS system and does not involve any conflicts, disagreements, or problems within a romantic relationship.'}
+2026-11-13 15:45:35,975 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation involves a user asking for help creating scripts, but there is no discussion about romantic relationships, conflicts, or issues within a romantic relationship. The content is focused on programming and scripting.'}
+2026-11-13 15:45:35,975 - filter - ERROR - Invalid response for record c44e503d8db7dec95b7e852e2abc3a38. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation involves a user asking for help creating scripts, but there is no discussion about romantic relationships, conflicts, or issues within a romantic relationship. The content is focused on programming and scripting.'}
+2026-11-13 15:45:45,716 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about Hurricane Florence and its characteristics, such as strength, size, and behavior. It does not involve any discussion about romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:45:45,716 - filter - ERROR - Invalid response for record 0101919a0f86824c2e1db3301d828174. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about Hurricane Florence and its characteristics, such as strength, size, and behavior. It does not involve any discussion about romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:45:48,906 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': "The conversation appears to be about the user's professional goals in AI research and teaching, without any mention of romantic conflicts, disagreements, or relationship issues."}
+2026-11-13 15:45:48,906 - filter - ERROR - Invalid response for record 05e1c09adf6214c8e3cd610d2c120661. Response: {'IssuesRelated': False, 'Reasoning': "The conversation appears to be about the user's professional goals in AI research and teaching, without any mention of romantic conflicts, disagreements, or relationship issues."}
+2026-11-13 15:45:54,814 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': True, 'Reasoning': "The conversation discusses specific submission moves in wrestling, including details about Gail Kim's use of the 'Christo' submission move. It involves technical wrestling details and does not directly relate to romantic relationship issues."}
+2026-11-13 15:45:54,814 - filter - ERROR - Invalid response for record f3af4414c2421c311503181b6e6f75a6. Response: {'IssuesRelated': True, 'Reasoning': "The conversation discusses specific submission moves in wrestling, including details about Gail Kim's use of the 'Christo' submission move. It involves technical wrestling details and does not directly relate to romantic relationship issues."}
+2026-11-13 15:46:00,611 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about generating text prompts for an AI text-to-image software, which is a technical and creative task. There are no discussions about romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:46:00,611 - filter - ERROR - Invalid response for record 2203630c5af01c9b4a9a521ff84dcc7b. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about generating text prompts for an AI text-to-image software, which is a technical and creative task. There are no discussions about romantic relationships, conflicts, or issues within a romantic relationship.'}
+2026-11-13 15:46:05,263 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation involves a user and an assistant discussing script ideas, which is unrelated to romantic relationship issues. There is no mention of conflicts, disagreements, or problems within a romantic relationship.'}
+2026-11-13 15:46:05,263 - filter - ERROR - Invalid response for record e63f99da04468245966d70a3ae7431ff. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation involves a user and an assistant discussing script ideas, which is unrelated to romantic relationship issues. There is no mention of conflicts, disagreements, or problems within a romantic relationship.'}
+2026-11-13 15:46:08,079 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about anime recommendations and does not involve any romantic relationship issues, conflicts, or discussions about romantic relations.'}
+2026-11-13 15:46:08,080 - filter - ERROR - Invalid response for record 267bae95cf391cc09f2d7ab26237395f. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about anime recommendations and does not involve any romantic relationship issues, conflicts, or discussions about romantic relations.'}
+2026-11-13 15:46:16,917 - filter - ERROR - Invalid response: expected string or bytes-like object. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about brainstorming creative ice cream shapes and ideas for silk-made city architecture, which is a creative and non-romantic topic. There are no mentions of conflicts, disagreements, or issues within a romantic relationship.'}
+2026-11-13 15:46:16,918 - filter - ERROR - Invalid response for record ffe98a5fca1986aebd69905a6774d333. Response: {'IssuesRelated': False, 'Reasoning': 'The conversation is about brainstorming creative ice cream shapes and ideas for silk-made city architecture, which is a creative and non-romantic topic. There are no mentions of conflicts, disagreements, or issues within a romantic relationship.'}
+2026-11-13 15:46:16,963 - filter - INFO - Final checkpoint saved at index 100. Total matches: 0
