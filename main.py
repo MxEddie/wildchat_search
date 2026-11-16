@@ -137,8 +137,7 @@ def main():
             logger.info(f"Created output directory: {args.output_dir}")
     else:
         args.output_dir = "./"  # Default to current directory if no output directory is specified
-    search_output_file_path = os.path.join(args.output_dir, args.search_output_file if args.search_output_file else f"matched_{args.dataset}.json")
-    
+    search_output_file_path = os.path.join(args.output_dir, args.search_output_file if args.search_output_file else f"matched_{args.dataset}.jsonl")
 
     ## Search the dataset for matching conversations and save to a JSON file, or load from an existing JSON file
     if not args.no_search:
@@ -146,22 +145,25 @@ def main():
             logger.info("Searching dataset for matching conversations")
             try:
                 keep_dict = run_search(output_file=search_output_file_path,template_info=template_info,datasetname=args.dataset,data_limit=args.data_limit,country=country,conv_len_limit=args.search_conv_turn_limit,turn_len_limit=args.search_turn_len_limit,resume=args.resume_search, test_input_file=args.test_input_file)
+
+                assert keep_dict > 0, "No search matches found. Please check your search parameters or the output file."
             except Exception as e:
                 logger.error(f"Search failed: {e}")
                 raise e
-        else: 
-            logger.info(f"Loading conversations from file: {search_output_file_path}")
-            keep_dict = json.load(open(search_output_file_path,"r"))
-            logger.info(f"{len(keep_dict)} conversations loaded from file")
 
-        ## Check if any conversations were found and raise an error if not
-        assert keep_dict is not None, "Conversations not found"
-        assert len(keep_dict) > 0, "No search matches found. Please check your search parameters or the output file."
-        
+        logger.info(f"Loading conversations from file: {search_output_file_path}")
 
-        ## Sample the matched conversations and print a sample to the console
-        sample_ids, sample_conversations = sample_output(keep_dict, sample_size=5, turn_count_max=2)
-        #print(f"Sample of matched conversations: {sample_conversations}")
+        ## Loading as dictionary of conversation ID -> match info for filtering
+        keep_dict = {}
+        with open(search_output_file_path, "r", encoding="utf-8") as f:
+            for line in f:
+                try:
+                    data = json.loads(line)
+                    conv_id = data.pop("id", None)
+                    if conv_id is not None:
+                        keep_dict[conv_id] = data
+                except json.JSONDecodeError as e:
+                    logger.error(f"JSON decode error for line: {line}. Error: {e}")
 
         ## Delete categories not in the sets to avoid unnecessary counting
         match_counts = {label: 0 for label in template_info["templates"].keys()}
@@ -174,27 +176,14 @@ def main():
                     pass  # If the label is not present in the info, skip it
         logger.info(f"Match counts: {match_counts}")
 
-        ## Turn the matched conversations into a Huggingface dataset for filtering
-        def gen_dataset(keep_dict):
-            for conv_id, info in keep_dict.items():
-                print(info)
-                yield {"conversation_id": conv_id, "conversation": info["Conversation"], "matches": {label: info.get(label, False) for label in template_info["templates"].keys()}}
-        ## crop length of all individual turns to handle issue of run on input
-        def crop_conversation(conversation, turn_len_limit=8000):
-            cropped_conversation = []
-            for turn in conversation:
-                if len(turn) > turn_len_limit:
-                    cropped_turn = turn[:turn_len_limit]
-                    cropped_conversation.append(cropped_turn)
-                else:
-                    cropped_conversation.append(turn)
-            return cropped_conversation
 
-        def gen_dataset(keep_dict):
-            for conv_id, info in keep_dict.items():
-                cropped_conv = crop_conversation(info["Conversation"], 1000)
-                yield {"conversation_id": conv_id, "conversation": cropped_conv, "matches": {label: info.get(label, False) for label in template_info["templates"].keys()}}
-        dataset = Dataset.from_generator(gen_dataset, gen_kwargs={"keep_dict": keep_dict})
+        ## Loading as a Huggingface dataset for filtering
+        dataset = load_dataset("json", data_files=search_output_file_path, split="train")        
+
+
+        ## Sample the matched conversations and print a sample to the console
+        #sample_ids, sample_conversations = sample_output(keep_dict, sample_size=5, turn_count_max=2)
+        #print(f"Sample of matched conversations: {sample_conversations}")
     
     else:
         if args.dataset == "wildchat":

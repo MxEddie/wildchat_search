@@ -1,4 +1,3 @@
-import pandas as pd
 import json
 from conversation import FormattedConversation
 from datasets import load_dataset
@@ -14,78 +13,39 @@ DATASETS = {
     "lmsys-chat": "lmsys/lmsys-chat-1m"
 }
 
-CHECKPOINT_INTERVAL = 10000  # Save progress every 10,000 conversations
+BATCH_SIZE = 1000  # Conversations per batch; progress is saved after every batch
 
 
-def _atomic_write(output_file, text):
-    """Atomically overwrite the output file and record progress.
-    
-    Parameters:
-        output_file (str): The path to the output file.
-        text (str): The text content to write to the output file.
-    """
-    tmp = output_file + ".tmp"
+def _atomic_write(path, text):
+    """Atomically overwrite a file."""
+    tmp = path + ".tmp"
     with open(tmp, "w") as f:
         f.write(text)
         f.flush()
         os.fsync(f.fileno())
-    os.replace(tmp, output_file)  # atomic overwrite
+    os.replace(tmp, path)
 
-def _write_rows(output_file, rows):
-    """Write the rows to the output file in JSON format.
-    
-    Parameters:
-        output_file (str): The path to the output file.
-        rows (list): The list of rows to write.
-    """
-    _atomic_write(output_file, json.dumps(rows, indent=4))
+def save_progress(output_file, next_index, offset):
+    """Atomically record the next dataset index and the matching output file size in bytes."""
+    _atomic_write(output_file + ".progress", f"{next_index} {offset}")
 
-def save_checkpoint(output_file, rows, next_index):
-    """Save the current rows and progress index to the output file and a progress file.
-    
-    Parameters:
-        output_file (str): The path to the output file.
-        rows (list): The list of rows to save.
-        next_index (int): The next index to save in the progress file (e.g. where the search will resume).
-    """
-    _write_rows(output_file, rows)
-    _atomic_write(output_file + ".progress", str(next_index))
-
-def load_checkpoint(output_file, resume) -> tuple[dict, int]:
-    """
-    Load the saved rows and progress index from the output file and a progress file.
-    
-    Parameters:
-        output_file (str): The path to the output file.
-        resume (bool): Whether to resume from a previous checkpoint.
-    
-    Returns:
-        tuple[dict, int]: A tuple containing the loaded rows and the starting index.
-    """
-    rows, start = {}, 0
+def load_progress(output_file, resume) -> tuple[int, int]:
+    """Return (next_index, output_offset) to resume from, or (0, 0) if not resuming."""
     if resume:
         try:
-            with open(output_file) as f:
-                rows = json.load(f)
-
-            progress_path = output_file + ".progress"
-            with open(progress_path) as f:
-                start = int(f.read().strip())
+            with open(output_file + ".progress") as f:
+                parts = f.read().split()
+            index = int(parts[0])
+            # Older progress files only held the index; fall back to the current file size
+            offset = int(parts[1]) if len(parts) > 1 else os.path.getsize(output_file)
+            return index, offset
         except FileNotFoundError:
-            module_logger.warning(f"Progress file or output file not found. Starting from the beginning.")
-            rows, start = {}, 0
-    return rows, start
+            module_logger.warning("Progress or output file not found. Starting from the beginning.")
+    return 0, 0
 
 def search_conversation(example: dict, datasetname: str, template_info: dict, turn_len_limit:Optional[int]=None, conv_len_limit:Optional[int]=None) -> Optional[tuple[str, dict]]:
     """Search a single conversation for matches to the provided templates. 
     
-    Parameters:
-        example (dict): The conversation to search.
-        datasetname (str): The name of the dataset the conversation belongs to (defines expected format).
-        template_info (dict): The templates to search for.
-        turn_len_limit (int, optional): The maximum length of a single user turn in the conversation. If any user turn exceeds this limit, will be truncated.
-        conv_len_limit (int, optional): The maximum length of a conversation for searching, if exceeded remaining turns will be skipped.
-
     Returns:
         tuple[str, dict]: A tuple containing the conversation ID and the match information, if a match is found, else None."""
     conv = FormattedConversation(example,datasetname)
@@ -94,22 +54,33 @@ def search_conversation(example: dict, datasetname: str, template_info: dict, tu
         return (conv.id, {"Conversation": conv.conversation, "Model": conv.model, "Hashed IP": conv.ip, **match})
     return None
 
-def run_search(output_file:str,template_info:dict, datasetname:str, data_limit:Optional[int]=None,country:Optional[str]=None, turn_len_limit:Optional[int]=None, conv_len_limit:Optional[int]=None, resume:bool=False, test_input_file:str=None) -> dict:
-    '''Function which seaches through a stream of the dataset, optionally up to a set limit, and writes matches to an output file, then returns a dataframe of the matches.
-    
-    Parameters:
-        output_file (str): The path to the output file where matched conversations will be saved.
-        template_info (dict): A dictionary which contains a dictionary of templates to search for, where keys are template names and values are lists of phrases to match, and two lists of template names to check for matches in the conversation.
-        datasetname (str): The name of the dataset to search ("wildchat" or "lmsys-chat").
-        data_limit (int, optional): The maximum number of instances to take from the dataset. If None, all instances will be taken.
-        country (str): The country to filter conversations by (if provided).
-        turn_len_limit (int, optional): The maximum length of a single user turn in the conversation. If any user turn exceeds this limit, the function will return False.
-        conv_len_limit (int, optional): The maximum length of a conversation for searching, if exceeded remaining turns will be skipped.
-        resume (bool): Whether to resume from a previous search. If True, the function will load the output file and progress file to continue searching from where it left off.
-        test_input_file (str, optional): The path to a test input file containing a single conversation to test the search function. If provided, the function will only process this single conversation instead of streaming the dataset.
-    
+def search_batch(batch: dict, country: Optional[str], **search_kwargs) -> dict:
+    """Map function: regex-search one batch (dict of column -> list) of conversations.
+
+    Returns a single output row for the batch: the number of conversations
+    processed and the matches as newline-separated JSON lines.
+    """
+    keys = list(batch.keys())
+    n = len(batch[keys[0]])
+    lines = []
+    for values in zip(*batch.values()):
+        example = dict(zip(keys, values))
+        try:
+            if example.get("language") == "English" and (country is None or example.get("country") == country):
+                hit = search_conversation(example, **search_kwargs)
+                if hit:
+                    lines.append(json.dumps({"id": hit[0], **hit[1]}, ensure_ascii=False))
+        except Exception as e:
+            module_logger.error(f"Error processing conversation: {e}")
+    return {"n": [n], "hits": ["\n".join(lines)]}
+
+def run_search(output_file:str,template_info:dict, datasetname:str, data_limit:Optional[int]=None,country:Optional[str]=None, turn_len_limit:Optional[int]=None, conv_len_limit:Optional[int]=None, resume:bool=False, test_input_file:str=None) -> int:
+    '''Streams the dataset in batches, regex-searches each batch with a map function, and appends matches to a JSONL file.
+
+    Parameters are as before. 
+
     Returns:
-        dict: A dictionary containing the matched conversations and their details.
+        int: The number of matches written during this run.
     '''
 
     if datasetname not in DATASETS:
@@ -131,29 +102,24 @@ def run_search(output_file:str,template_info:dict, datasetname:str, data_limit:O
         with open(test_input_file) as f:
             example = json.load(f)
         hit = search_conversation(example, **search_kwargs)
-        rows = {hit[0]: hit[1]} if hit else {}
-        if output_file:
-            _write_rows(output_file, rows) # Does not save progress file in test mode
-        return rows
-
+        with open(output_file, "w") as f:  # Does not save progress file in test mode
+            if hit:
+                f.write(json.dumps({"id": hit[0], **hit[1]}, ensure_ascii=False) + "\n")
+        return 1 if hit else 0
 
     ## Streaming mode 
     module_logger.info(f"Turn length limit: {turn_len_limit} | Conversation length limit: {conv_len_limit}")
-    module_logger.info(f"Data limit set to: {data_limit}")
+    module_logger.info(f"Data limit set to: {data_limit} | Batch size: {BATCH_SIZE}")
     module_logger.info(f"Resume search from: {resume}")
     module_logger.info(f"Filtering by country: {country}")
 
+    start_index, start_offset = load_progress(output_file, resume)
 
-    if datasetname == "wildchat":
-            name = "allenai/wildchat-4.8m-full"
-    elif datasetname == "lmsys-chat":
-        name = "lmsys/lmsys-chat-1m"
-    else:
-        raise ValueError(f"Dataset {datasetname} not supported. Please choose either 'wildchat' or 'lmsys-chat'.")
+    if start_index > 0:
+        # Discard anything written after the last checkpoint (partial or unrecorded batches)
+        os.truncate(output_file, start_offset)
 
-    rows, start_index = load_checkpoint(output_file, resume)
-    
-    dataset = load_dataset(name,"default",split="train",streaming=True)
+    dataset = load_dataset(DATASETS[datasetname], "default", split="train", streaming=True)
 
     if data_limit is not None:
         dataset = dataset.take(data_limit)
@@ -161,25 +127,34 @@ def run_search(output_file:str,template_info:dict, datasetname:str, data_limit:O
         module_logger.info(f"Resuming search from index {start_index}")
         dataset = dataset.skip(start_index)
 
-    next_index = start_index
+    # Remove the original columns so each batch collapses to one small result row
+    columns = dataset.column_names or list(next(iter(dataset)).keys())
+    dataset = dataset.map(
+        search_batch,
+        batched=True,
+        batch_size=BATCH_SIZE,
+        remove_columns=columns,
+        fn_kwargs={"country": country, **search_kwargs},
+    )
 
-    try:            
-        for i,example in enumerate(tqdm(dataset, initial=next_index, total=data_limit, desc="Searching dataset")):
-            try:
-                if example.get("language") == "English" and (country is None or example.get("country") == country):
-                    hit = search_conversation(example, **search_kwargs)
-                    if hit:
-                        rows[hit[0]] = hit[1]
-            except Exception as e:
-                module_logger.error(f"Error processing conversation at index {i}: {e}")
-                continue  # Skip this conversation and continue with the next one
-            next_index += 1
-            
-            if next_index % CHECKPOINT_INTERVAL == 0:
-                save_checkpoint(output_file, rows, next_index)
-                module_logger.info(f"Checkpoint saved at index {next_index}. Total matches so far: {len(rows)}")
-    finally:
-        save_checkpoint(output_file, rows, next_index)
-        module_logger.info(f"Final checkpoint saved at index {next_index}. Total matches: {len(rows)}")
-    
-    return rows
+    next_index, n_matches = start_index, 0
+    mode = "a" if start_index > 0 else "w"  # Append when resuming, otherwise start a fresh file
+
+    next_index, n_matches = start_index, 0
+    mode = "a" if start_index > 0 else "w"  # Append when resuming, otherwise start a fresh file
+
+    with open(output_file, mode) as out, tqdm(initial=start_index, total=data_limit, desc="Searching dataset") as pbar:
+        try:
+            for result in dataset:
+                if result["hits"]:
+                    out.write(result["hits"] + "\n")
+                    n_matches += result["hits"].count("\n") + 1
+                out.flush()
+                os.fsync(out.fileno())
+                next_index += result["n"]
+                save_progress(output_file, next_index, os.fstat(out.fileno()).st_size)
+                pbar.update(result["n"])
+        finally:
+            module_logger.info(f"Stopped at index {next_index}. Matches written this run: {n_matches}")
+
+    return n_matches
