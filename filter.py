@@ -1,284 +1,283 @@
 """
-This module contains the EvaluateModel class, which is responsible for assessing whether conversations in a dataset are relevant to a particular topic. 
+Batched conversation evaluation with a local Hugging Face model.
+
+Takes a Hugging Face ``Dataset`` (or a streaming ``IterableDataset``) of conversations,
+asks a local text-generation model to label each one, and returns a new ``Dataset``
+containing only the conversations that match.
+
+Instead of calling the pipeline once per conversation, rows are read in chunks, sorted by
+prompt length (to minimise padding) and sent to the model in real batches.
 """
 
+import json
+import logging
 import os
+from itertools import islice
+from time import sleep
 
 import transformers
-import logging
-from time import sleep
-import json
-import copy
-from utils import parse_dict
+from datasets import Dataset, IterableDataset
 from tqdm import tqdm
-from utils import sample_output
+
+from utils import parse_dict, sample_output
 
 module_logger = logging.getLogger(__name__)
 
-CHECKPOINT_INTERVAL = 50  # Save progress every 50 conversations, filtering is slow
+DEFAULT_CHUNK_SIZE = 128  # rows generated, written and fsynced together (the checkpoint unit)
+
+
+def conversation_to_turns(conversation) -> list[str]:
+    """Normalise a dataset conversation into a list of turn strings.
+
+    Accepts a list of messages ({"role": ..., "content": ...}, as in WildChat / LMSYS-Chat),
+    a list of plain strings, or the older {"turn_0": text, ...} dict.
+    """
+    if isinstance(conversation, dict):
+        return [str(t) for t in conversation.values()]
+    return [str(t["content"]) if isinstance(t, dict) else str(t) for t in conversation]
 
 
 class EvaluateModel:
     """
-    A class used to represent a language model for evaluating conversations based on prompts and system prompts. 
+    Evaluates conversations from a Hugging Face dataset with a local text-generation model.
 
     Attributes:
-        name (str): The name of the model.
-        model (str): The name of the model to use for generating outputs.
-        hf_access_token (str): The Hugging Face access token for the model.
-        retry_attempts (int): The number of times to retry a failed API call.
-        kwargs (dict): Additional keyword arguments for response generation, such as max_output_tokens, temperature, etc.
-
-    Methods:
-        gen_response(prompts, system_prompt): Generates responses for a list of prompts using the specified model and system prompt, returning a DataFrame with the results.
+        model (str): Model name or path.
+        retry_attempts (int): Retries for a single prompt that keeps failing.
+        batch_size (int): Number of prompts sent to the model at once (tune to your VRAM).
+        max_output_tokens (int | None): Max new tokens per response.
+        generation_kwargs (dict): Extra generation kwargs (do_sample defaults to False).
     """
-    def __init__(self, model, hf_access_token=None, retry_attempts=3, **kwargs):
-        """
-        Initialize the OutputModel with the specified model, family, call type, API key, Hugging Face access token, retry attempts, and additional keyword arguments.
-        """
 
+    def __init__(self, model, hf_access_token=None, retry_attempts=3, batch_size=16,
+                 max_output_tokens=128, pipeline_kwargs=None, **generation_kwargs):
         self.model = model
-        self.hf_access_token = hf_access_token
         self.retry_attempts = int(retry_attempts)
-        self.kwargs = kwargs ## Handle additional keyword arguments for response generation, such as max_output_tokens, temperature, etc.
+        self.batch_size = int(batch_size)
+        self.max_output_tokens = max_output_tokens
+        self.generation_kwargs = {"do_sample": False, **generation_kwargs}
+        if max_output_tokens is not None:
+            self.generation_kwargs["max_new_tokens"] = max_output_tokens
 
-        self.client = transformers.pipeline("text-generation", model=self.model, token=self.hf_access_token)
-    
-    def __checkpoint_save(self, rows, output_file, next_index):
-        """Atomically overwrite the output file and record progress."""
-        tmp = output_file + ".tmp"
-        with open(tmp, "w") as f:
-            json.dump(rows, f, indent=4)
-            f.flush()
-            os.fsync(f.fileno())
-        os.replace(tmp, output_file)  # atomic overwrite
+        # pipeline_kwargs lets you pass e.g. device_map="auto" or dtype="auto"
+        self.client = transformers.pipeline(
+            "text-generation", model=model, token=hf_access_token, **(pipeline_kwargs or {})
+        )
+        tokenizer = self.client.tokenizer
+        tokenizer.padding_side = "left"  # required for batched decoder-only generation
+        if tokenizer.pad_token is None:
+            tokenizer.pad_token = tokenizer.eos_token
 
-        with open(output_file + ".progress", "w") as f:
-            f.write(str(next_index))
+    # ------------------------------------------------------------------ prompts
 
-    def __checkpoint_load(self, output_file, resume):
-        """Return (rows, start_index). Falls back to the `resume` arg if no progress file."""
-        rows, start = {}, 0
-        if resume:
-            if os.path.exists(output_file):
-                with open(output_file) as f:
-                    rows = json.load(f)
-            progress_path = output_file + ".progress"
-            if os.path.exists(progress_path):
-                with open(progress_path) as f:
-                    start = int(f.read().strip())
-            else:
-                start = resume if isinstance(resume, int) else 0
-        return rows, start
+    def _build_prompt(self, conversation, system_prompt, key, conv_turn_limit, turn_len_limit) -> str:
+        turns = conversation_to_turns(conversation)[:conv_turn_limit]
+        turns = {f"turn_{i}": text[:turn_len_limit] for i, text in enumerate(turns)}
+        user_message = (
+            "Evaluate the following conversation. Respond with a single valid JSON object and nothing else. "
+            "No markdown, no code fences, no explanation before or after. "
+            "The JSON must have exactly these keys:\n"
+            "{\n"
+            f'"{key}": <boolean>,\n'
+            '"Reasoning": <string, max 2 sentences>\n'
+            "}\n"
+            f"Conversation: {turns}"
+        )
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_message},
+        ]
+        return self.client.tokenizer.apply_chat_template(
+            messages, tokenize=False, add_generation_prompt=True, enable_thinking=False
+        )
 
-    def __hf_generate(self, system_prompt_dict: dict, input: list[dict]) -> str:
+    # --------------------------------------------------------------- generation
 
-        kwargs = dict(self.kwargs)  ## Create a copy of the kwargs to avoid modifying the original dictionary
-        if "max_output_tokens" in kwargs and kwargs["max_output_tokens"] is not None:
-            kwargs["max_new_tokens"] = kwargs.pop("max_output_tokens")  ## Rename max_output_tokens to max_length for Hugging Face pipeline
-        input = [system_prompt_dict] + [input]  ## Combine system prompt and input messages into a single list for Hugging Face pipeline
-        input = self.client.tokenizer.apply_chat_template(input, tokenize=False, add_generation_prompt=True, enable_thinking=False)  ## Tokenize the input for Hugging Face pipeline
-        for i in range(self.retry_attempts):
-            try:
-                output = self.client(input, return_full_text=False, **kwargs)  ## Generate output using the Hugging Face pipeline
-                return output[0]["generated_text"]  ## Return the generated text from the output
-            except Exception as e:
-                module_logger.error(f"Error generating response from Hugging Face model: {e}. Attempt {i+1} of {self.retry_attempts}. Retrying...")
-                sleep(2 ** i)  ## Exponential backoff for retries
+    def _run(self, prompts: list[str]) -> list[str]:
+        outputs = self.client(
+            prompts, batch_size=len(prompts), return_full_text=False, **self.generation_kwargs
+        )
+        return [(o[0] if isinstance(o, list) else o)["generated_text"] for o in outputs]
 
-        raise RuntimeError(f"Failed to generate response from Hugging Face model after {self.retry_attempts} attempts.")
-
-    def _generate_response(self, system_prompt_dict: dict, input: list[dict]) -> str:
-        """
-        Generate a response for a given system prompt and input using the specified model.
-
-        Parameters:
-            system_prompt_dict (dict): A dictionary containing the system prompt with keys "role" and "content".
-            input (list[dict]): A list of dictionaries representing the conversation messages, each with keys "role" and "content".
-
-        Returns:
-            str: The generated response from the model.
-        """
-        try:
-            response = self.__hf_generate(
-                    system_prompt_dict=system_prompt_dict,
-                    input=input,
-                )
-            return response
-        except Exception as e:
-            raise RuntimeError(f"Failed to generate response from model {self.model} after {self.retry_attempts} attempts. Error: {e}")
-
-    def _generate_conversation(self, conversation, system_prompt, output_count=1):
-
-        response = None
-
-        for count in range(output_count):
-            system_prompt_dict = {"role": "system", "content": system_prompt}
-            if self.conv_turn_limit is not None:
-                conversation = {f"turn_{i}": conversation[turn] for i, turn in enumerate(conversation) if i < self.conv_turn_limit}  ## Create a dictionary of conversation turns with keys "turn_0", "turn_1", up to the turn count limit
-            ## Crop all conversation turns to the specified length to avoid exceeding the model's input limit
-            conversation = {turn: conversation[turn][:self.turn_len_limit] for turn in conversation}
-            input = {"role": "user", "content": f"""Evaluate the following conversation. Respond with a single valid JSON object and nothing else. No markdown, no code fences, no explanation before or after. The JSON must have exactly these keys:
-            {{
-            "{self.key}": <boolean>,
-            "Reasoning": <string, max 2 sentences>
-            }}.
-            Conversation:""" + str(conversation)} 
-            try:
-                response = self._generate_response(system_prompt_dict, input)
-            except Exception as e:
-                print(f"Error generating response: {e}")
-                raise RuntimeError(f"Failed to generate response from model {self.model} after {self.retry_attempts} attempts. Error: {e}")
-
-        return response
-
-
-
-    def __generate(self, records: dict, system_prompt: str, output_count=1) -> dict[list[list]]:
-        """
-        Generate output for input records using the specified model and system prompt. 
-
-        Parameters:
-            records (dict): A dictionary of input records, where each record is a dictionary containing the conversation data.
-            system_prompt (str): The system prompt to use for generating the response. If None, a default prompt will be used.
-            input_count (int): The number of inputs to expect
-            output_count (int): The number of outputs to generate for each input.
-        
-        Returns:
-            dict[list[list]]: A dictionary...
-        """
-
-        ## Update system prompt to add limit if max_output_tokens is specified in kwargs.
-        output_limit = self.kwargs.get("max_output_tokens", None)
-        if output_limit is not None:
-            system_prompt = f"{system_prompt} Limit your response to {output_limit} tokens." 
-
-        rows, start_index = self.__checkpoint_load(self.output_file, self.resume)
-
-        if rows == {}:
-            new_records = copy.deepcopy(records)  ## Create a deep copy of the records to avoid modifying the original data
-        else:
-            new_records = copy.deepcopy(rows)  ## Create a deep copy of the rows to avoid modifying the original data
-
-        if start_index == len(records):
-            module_logger.info(f"All records have already been processed. Skipping generation.")
-            return new_records  ## Return the new records if all records have already been processed
-
-        try: 
-            for i, (record_id, record) in tqdm(enumerate(records.items()), desc=f"Generating {self.key} evaluation for records", unit="record"):
-                if i < start_index:
-                    continue
-                new_record = copy.deepcopy(record)  ## Create a deep copy of the record to avoid modifying the original data
-                conversations = record["Conversation"]  ## Get the list of conversations from the record
-                response = self._generate_conversation(conversations, system_prompt, output_count=output_count)  ## Generate the conversation output
-                ## Store json object in the new records, converting from string to dict if necessary
+    def _generate_batch(self, prompts: list[str]) -> list[str | None]:
+        """Run one batch. On failure (e.g. OOM) split it in half; a lone prompt is retried, then skipped."""
+        if len(prompts) == 1:
+            for attempt in range(self.retry_attempts):
                 try:
-                    response = parse_dict(response)  ## Convert the response string to a dictionary using parse_dict function
+                    return self._run(prompts)
+                except Exception as e:
+                    module_logger.error(
+                        f"Generation failed (attempt {attempt + 1}/{self.retry_attempts}): {e}"
+                    )
+                    sleep(2 ** attempt)
+            return [None]
+        try:
+            return self._run(prompts)
+        except Exception as e:
+            module_logger.warning(f"Batch of {len(prompts)} failed ({e}); splitting it in half.")
+            mid = len(prompts) // 2
+            return self._generate_batch(prompts[:mid]) + self._generate_batch(prompts[mid:])
+
+    def _generate_all(self, prompts: list[str]) -> list[str | None]:
+        """Generate for many prompts: sort by length, run in batches, restore original order."""
+        order = sorted(range(len(prompts)), key=lambda j: len(prompts[j]))
+        sorted_outputs: list[str | None] = []
+        for start in range(0, len(order), self.batch_size):
+            batch = [prompts[j] for j in order[start:start + self.batch_size]]
+            sorted_outputs.extend(self._generate_batch(batch))
+        results: list[str | None] = [None] * len(prompts)
+        for pos, j in enumerate(order):
+            results[j] = sorted_outputs[pos]
+        return results
+
+    @staticmethod
+    def _parse(text, key):
+        """Turn raw model text into {key: bool, "Reasoning": str}, or None if unusable."""
+        if text is None:
+            return None
+        try:
+            parsed = parse_dict(text)
+            value = parsed[key]
+            if isinstance(value, str):
+                lowered = value.strip().lower()
+                if lowered not in ("true", "false"):
+                    raise ValueError(f"non-boolean value {value!r}")
+                value = lowered == "true"
+            return {key: bool(value), "Reasoning": str(parsed.get("Reasoning", ""))}
+        except Exception as e:
+            module_logger.warning(f"Could not parse model response ({e}): {text[:200]!r}")
+            return None
+
+    # ------------------------------------------------------------- checkpointing
+
+    @staticmethod
+    def _load_progress(path: str) -> list[dict]:
+        """Read the JSONL progress file, dropping (and truncating away) a partially written last line."""
+        records, good_bytes = [], 0
+        if not os.path.exists(path):
+            return records
+        with open(path, "rb") as f:
+            for line in f:
+                try:
+                    records.append(json.loads(line))
                 except json.JSONDecodeError:
-                    module_logger.error(f"Failed to parse response for record {record_id}. Response: {response}")
-                    response = None
+                    break
+                good_bytes += len(line)
+        with open(path, "r+b") as f:
+            f.truncate(good_bytes)
+        return records
 
-                new_records[record_id]["Evaluation"] = response  ## Store the generated output in the new records  
-                if (i + 1) % CHECKPOINT_INTERVAL == 0 and self.output_file is not None:  ## Save progress every 50 records if output_file is specified
-                    self.__checkpoint_save(new_records, self.output_file, i + 1)
-        finally:
-            self.__checkpoint_save(new_records, self.output_file, i + 1)
-            module_logger.info(f"Final checkpoint saved at index {i + 1}. Total matches: {len(new_records)}")
+    # ----------------------------------------------------------------- main API
 
-        return new_records  ## Return the new records with the generated output
-
-    def gen_output(self, records: dict, system_prompt=None, output_count=1, turn_len_limit:int = None, conv_turn_limit:int = None, key:str = "Sexual_Content", output_file:str = None, resume: bool = False) -> dict[list[list]]:
+    def evaluate(self, dataset, system_prompt, key, output_file,
+                 conversation_column="conversation", id_column=None, keep_value=True,
+                 conv_turn_limit=None, turn_len_limit=None, chunk_size=DEFAULT_CHUNK_SIZE,
+                 resume=False, data_limit=None) -> Dataset:
         """
-        Generate output for input records using the specified model and system prompt. 
+        Label every conversation in ``dataset`` and return a Dataset of the rows to keep.
 
         Parameters:
-            records (dict): A dictionary of input records, where each record is a dictionary containing the conversation data.
-            system_prompt (str): The system prompt to use for generating the response. If None, a default prompt will be used.
-            input_count (int): The number of inputs to expect
-            output_count (int): The number of outputs to generate for each input.
+            dataset: datasets.Dataset or datasets.IterableDataset (e.g. load_dataset(..., streaming=True)).
+            system_prompt (str): System prompt describing what to flag.
+            key (str): Boolean key the model must return, e.g. "IssuesRelated".
+            output_file (str): Path prefix. Progress is appended to "<output_file>.<key>.progress.jsonl".
+            conversation_column (str): Column holding the conversation.
+            id_column (str | None): Column holding a unique id (falls back to the row index).
+            keep_value (bool | None): Keep rows whose evaluation[key] equals this. Rows the model
+                failed to label are dropped. None keeps every row (just adds the "Evaluation" column).
+                The progress file only stores rows that pass this filter, so reuse the same value on resume.
+            conv_turn_limit / turn_len_limit: Max turns per conversation / max characters per turn.
+            chunk_size (int): Rows per checkpoint. batch_size (set in __init__) controls GPU batching.
+            resume (bool): Continue from the progress file instead of starting over.
+            data_limit (int | None): Only process the first N rows.
+
         Returns:
-            dict[list[list]]: A dictionary where each key is a prompt and the value is a list of lists containing the generated response and any error encountered during generation.
+            Dataset: the kept rows, each with an added "Evaluation" column.
         """
-        if not records:
-            raise ValueError("No records provided for generation.")
+        if system_prompt is None:
+            raise ValueError("A system_prompt is required.")
+        if self.max_output_tokens is not None:
+            system_prompt = f"{system_prompt} Limit your response to {self.max_output_tokens} tokens."
 
-        self.conv_turn_limit = conv_turn_limit  ## Store the conversation turn limit for use in generating evaluations
-        self.turn_len_limit = turn_len_limit  ## Store the turn length limit for use in generating evaluations
-        self.key = key  ## Store the key for use in generating evaluation json objects
-        self.output_file = output_file  ## Store the output file for use in generating evaluation json objects
-        self.resume = resume  ## Store the resume flag for use in generating evaluation json objects
+        streaming = isinstance(dataset, IterableDataset)
+        if data_limit is not None:
+            dataset = dataset.take(data_limit) if streaming else dataset.select(range(min(data_limit, len(dataset))))
+        total = None if streaming else len(dataset)
 
-        output_dict = self.__generate(records, system_prompt, output_count)  ## Test generation to catch any errors before generating for all prompts
-        #print("Output dict:", output_dict)  ## Print the output dict to check the structure of the generated responses
+        progress_path = f"{output_file}.{key}.progress.jsonl"
+        if resume:
+            records = self._load_progress(progress_path)
+        else:
+            records = []
+            if os.path.exists(progress_path):
+                os.remove(progress_path)
+        start = len(records)
+        if start:
+            module_logger.info(f"Resuming from row {start}.")
 
-        return output_dict  ## Return the output dictionary containing the generated responses and any errors encountered during generation
+        remaining = dataset.skip(start) if streaming else dataset.select(range(start, len(dataset)))
+        rows = iter(remaining)
+        idx = start
 
-def filter_in_out(conversation, key, filter_out):
-    conversation_copy = copy.deepcopy(conversation)  ## Create a deep copy of the conversation to avoid modifying the original data
-    for conv_id, info in conversation.items():
-        print(f"Filtering conversation {conv_id} with evaluation: {info.get('Evaluation')}")
-        try:
-            if info["Evaluation"] is not None and info["Evaluation"][key] == filter_out:
-                    del conversation_copy[conv_id]  ## Remove conversations that contain the specified content
-        except Exception as e:
-            print(f"Error occurred while filtering conversation {conv_id} {info}: {e}")
+        with open(progress_path, "a") as out, \
+                tqdm(total=total, initial=start, desc=f"Evaluating {key}", unit="conv") as pbar:
+            while True:
+                chunk = list(islice(rows, chunk_size))
+                if not chunk:
+                    break
+                prompts = [
+                    self._build_prompt(row[conversation_column], system_prompt, key, conv_turn_limit, turn_len_limit)
+                    for row in chunk
+                ]
+                responses = self._generate_all(prompts)
 
-    return conversation_copy
+                for row, response in zip(chunk, responses):
+                    evaluation = self._parse(response, key)
+                    keep = keep_value is None or (evaluation is not None and evaluation[key] == keep_value)
+                    record = {
+                        "idx": idx,
+                        "id": row.get(id_column, idx) if id_column else idx,
+                        "Evaluation": evaluation,
+                        "row": {**row, "Evaluation": evaluation} if keep else None,
+                    }
+                    records.append(record)
+                    out.write(json.dumps(record, default=str) + "\n")  # default=str handles datetimes
+                    idx += 1
 
-def filter_conversations(conversations: dict, model_name: str = "Qwen/Qwen3-0.6B", output_count: int = 1, turn_len_limit: int = None, conv_turn_limit: int = None, system_prompt: str = None, key: str = "Sexual_Content", filter = None, filter_out: bool = None, resume: bool = False, output_file: str = None) -> dict:
-    model = EvaluateModel(model=model_name, hf_access_token=os.environ.get("HF_TOKEN"), retry_attempts=3)
-    
-    output = model.gen_output(records=conversations, system_prompt=system_prompt, output_count=output_count, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, key=key, output_file=f"{output_file}.{key}.json", resume=resume)
+                out.flush()
+                os.fsync(out.fileno())
+                pbar.update(len(chunk))
 
-    print(f"Example conversation: {next(iter(output.items()))[1]['Evaluation']}")  ## Print the evaluation of the first conversation for debugging purposes
-
-    ## Filter in or out irrelevant conversations
-    if filter:
-        try:
-            filtered_conversations = filter_in_out(output, key=key, filter_out=filter_out)
-        except Exception as e:
-            module_logger.error(f"Error occurred while filtering conversations: {e}")
-            raise RuntimeError(f"Error occurred while filtering conversations: {e}")
-        if len(filtered_conversations) == 0:
-            raise ValueError("No conversations found after filtering out irrelevant content.")
-        return filtered_conversations
-    
-    return output  ## Return the output dictionary containing the generated evaluations for all conversations
-
-def run_filter(conversations, model_name, turn_len_limit, conv_turn_limit, output_file, resume, data_limit=None):
-    if data_limit is not None:
-        conversations = dict(list(conversations.items())[:data_limit])  ## Limit the number of conversations to process if data_limit is specified
-    '''
-    system_prompt_template = """Evaluate the following conversation as to whether it {premise}. {definition}. Flag if it contains {label} and provide a brief reason for your decision. Respond with a single valid JSON object and nothing else. No markdown, no code fences, no explanation before or after. The JSON must have exactly these keys:
-        {{
-        '{key}': <boolean>,
-        "Reasoning": <string, max 2 sentences>
-        }}
-        Rules:
-            - Use double quotes for all keys and string values.
-            - Do not add extra keys.
-            - If you are unsure, still return the JSON with your best answer.
-            - Do not include any text outside of the JSON object.
-            - Do not include \\n, \\t, or any other escape characters in the JSON output.
-        
-        """
+        kept = [r["row"] for r in records if r["row"] is not None]
+        module_logger.info(f"Evaluated {len(records)} conversations; kept {len(kept)}.")
+        if not kept:
+            raise ValueError("No conversations found after filtering.")
+        return Dataset.from_list(kept)
 
 
-    ## Label sexual content
-    
-    system_prompt=system_prompt_template.format(
-        premise="contains sexual content", 
-        definition="Sexual content is defined as any conversation that involves explicit sexual acts, sexual behavior, or sexual references.", 
-        label="sexual content", 
-        key="Sexual_Content")
-    conversations = filter_conversations(conversations=conversations, model_name=model_name, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, system_prompt=system_prompt, key="Sexual_Content", filter=True, filter_out=True, resume=resume, output_file=output_file) ## Filter out sexual content
-    '''
+def filter_conversations(dataset, model_name: str = "Qwen/Qwen3-0.6B", system_prompt: str = None,
+                         key: str = "Sexual_Content", keep_value: bool = True,
+                         turn_len_limit: int = None, conv_turn_limit: int = None,
+                         conversation_column: str = "conversation", id_column: str = None,
+                         batch_size: int = 16, resume: bool = False, output_file: str = "filter_output",
+                         data_limit: int = None) -> Dataset:
+    model = EvaluateModel(model=model_name, hf_access_token=os.environ.get("HF_TOKEN"),
+                          retry_attempts=3, batch_size=batch_size)
+    return model.evaluate(
+        dataset, system_prompt=system_prompt, key=key, output_file=output_file,
+        conversation_column=conversation_column, id_column=id_column, keep_value=keep_value,
+        conv_turn_limit=conv_turn_limit, turn_len_limit=turn_len_limit,
+        resume=resume, data_limit=data_limit,
+    )
 
-    ## Label IPV content
+
+def run_filter(dataset, model_name, turn_len_limit, conv_turn_limit, output_file, resume,
+               data_limit=None, batch_size=16, conversation_column="conversation", id_column=None):
+    """Keep only conversations about romantic relationship issues and write them to ``output_file`` (JSONL)."""
     key = "IssuesRelated"
-    system_prompt = """You are a helpful conversation analysis system. Your task is to determine whether a conversation involves someone discussing issues in their romantic relationship. Some examples of romantic relationship issues are: disagreements, conflicts, arguments,infidelity, jealousy, control, and communication problems. The user may be asking for advice, venting, or looking to understand their feelings or their partner's behaviour. Flag the conversation if it is related to romantic relationship issues and provide a brief reason for your decision. Respond with a single valid JSON object and nothing else. No markdown, no code fences, no explanation before or after. The JSON must have exactly these keys:
+    system_prompt = f"""You are a helpful conversation analysis system. Your task is to determine whether a conversation involves someone discussing issues in their romantic relationship. Some examples of romantic relationship issues are: disagreements, conflicts, arguments, infidelity, jealousy, control, and communication problems. The user may be asking for advice, venting, or looking to understand their feelings or their partner's behaviour. Flag the conversation if it is related to romantic relationship issues and provide a brief reason for your decision. Respond with a single valid JSON object and nothing else. No markdown, no code fences, no explanation before or after. The JSON must have exactly these keys:
         {{
-        %s': <boolean>,
+        "{key}": <boolean>,
         "Reasoning": <string, max 2 sentences>
         }}
         Rules:
@@ -287,17 +286,29 @@ def run_filter(conversations, model_name, turn_len_limit, conv_turn_limit, outpu
             - If you are unsure, still return the JSON with your best answer.
             - Do not include any text outside of the JSON object.
             - Do not include \\n, \\t, or any other escape characters in the JSON output.
-        
-        """.format(key)
+        """
     try:
-        filtered_ipv = filter_conversations(conversations=conversations, model_name=model_name, turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit, system_prompt=system_prompt, key=key,resume=resume, filter=True, filter_out=False, output_file=output_file) ## Filter in IPV contents
-        json.dump(filtered_ipv, open(output_file,"w"), indent=4)
+        filtered = filter_conversations(
+            dataset, model_name=model_name, system_prompt=system_prompt, key=key, keep_value=True,
+            turn_len_limit=turn_len_limit, conv_turn_limit=conv_turn_limit,
+            conversation_column=conversation_column, id_column=id_column,
+            batch_size=batch_size, resume=resume, output_file=output_file, data_limit=data_limit,
+        )
+        filtered.to_json(output_file)  # JSON Lines
         module_logger.info(f"Filtered conversations saved to {output_file}")
-        sample_ids, sample_conversations = sample_output(filtered_ipv, sample_size=5, turn_count_max=2, label=key)
+
+        # sample_output expects the old {id: {"Conversation": {...}, "Evaluation": {...}}} layout
+        legacy = {
+            (row[id_column] if id_column else i): {
+                "Conversation": {f"turn_{j}": t for j, t in enumerate(conversation_to_turns(row[conversation_column]))},
+                "Evaluation": row["Evaluation"],
+            }
+            for i, row in enumerate(filtered)
+        }
+        sample_ids, sample_conversations = sample_output(legacy, sample_size=5, turn_count_max=2, label=key)
         print(f"IDs of filtered conversations: {sample_ids}")
         print(f"Sample of filtered conversations: {sample_conversations}")
     except ValueError as e:
         module_logger.error(f"Filtering failed: {e}")
         print(f"Filtering failed: {e}")
-        json.dump({},open(output_file,"w"), indent=4)
-
+        open(output_file, "w").close()
