@@ -217,8 +217,12 @@ def main():
         else:
             filter_output_file_path = os.path.join(args.output_dir, f"filtered_{args.dataset}.json")
         logger.info("Filtering matched conversations for relevancy using an LLM")
+        if args.dataset == "wildchat":
+            id_column = "conversation_hash"
+        elif args.dataset == "lmsys-chat":
+            id_column = "conversation_id"
         try:
-           run_filter(dataset=dataset, model_name=args.filter_model, turn_len_limit=args.filter_turn_len_limit, conv_turn_limit=args.filter_conv_turn_limit,output_file=filter_output_file_path, resume=args.resume_filter, data_limit=args.filter_data_limit, batch_size=args.filter_batch_size, conversation_column="conversation")
+           run_filter(dataset=dataset, id_column = id_column, model_name=args.filter_model, turn_len_limit=args.filter_turn_len_limit, conv_turn_limit=args.filter_conv_turn_limit,output_file=filter_output_file_path, resume=args.resume_filter, data_limit=args.filter_data_limit, batch_size=args.filter_batch_size, conversation_column="conversation")
         except ValueError as e:
             logger.error(f"Filtering failed: {e}")
             print(f"Filtering failed: {e}")

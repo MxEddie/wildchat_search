@@ -13,9 +13,9 @@ from tqdm import tqdm
 
 module_logger = logging.getLogger(__name__)
 
-TURN_LEN_LIMIT = 100
-CONV_TURN_LIMIT = 4
-BATCH_SIZE = 16
+TURN_LEN_LIMIT = 800
+CONV_TURN_LIMIT = 8
+BATCH_SIZE = 2
 
 
 # File Handling Functions
@@ -112,14 +112,14 @@ def conversation_to_turns(conversation) -> list[str]:
     """Normalise a dataset conversation into a list of turn strings."""
     if isinstance(conversation, dict):
         return [str(t) for t in conversation.values()]
-    return [str(t["content"]) if isinstance(t, dict) else str(t) for t in conversation]
+    return [(str(t["role"]), str(t["content"])) if isinstance(t, dict) else str(t) for t in conversation]
 
 
 def build_prompt(row: dict, conversation_column: str, key: str, conv_turn_limit: int, turn_len_limit: int) -> str:
     turns = conversation_to_turns(row[conversation_column])[:conv_turn_limit]
-    turns = {f"turn_{i}": text[:turn_len_limit] for i, text in enumerate(turns)}
+    turns = {f"turn_{i}_{text[0]}": text[1][:turn_len_limit] for i, text in enumerate(turns)}
     return (
-        "Evaluate the following conversation. Respond with a single valid JSON object and nothing else. "
+        "Evaluate the following conversation for whether the user is discussing issues in their romantic relationship. Respond with a single valid JSON object and nothing else. "
         "No markdown, no code fences, no explanation before or after. "
         "The JSON must have exactly these keys:\n"
         "{\n"
@@ -156,6 +156,7 @@ def validate_model_output(outputs: list, key: str) -> list[dict]:
 
 class EvaluationRunner:
     def __init__(self, model_name: str, key: str):
+        self.model_name = model_name
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         if self.device == "cuda":
             dtype = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
@@ -193,8 +194,8 @@ class EvaluationRunner:
         chats = [
             self.tokenizer.apply_chat_template(
                 [{"role": "system", "content": system_prompt}, {"role": "user", "content": p}],
-                tokenize=False, add_generation_prompt=True, enable_thinking=False,
-            )
+                tokenize=False, add_generation_prompt=True, enable_thinking=False if 
+            self.model_name.startswith("Qwen") else None)
             for p in prompts
         ]
         # No truncation to retain generation prompt.
@@ -260,7 +261,7 @@ class EvaluationRunner:
         print(f"Done. {n_pos} positives written this run to {output_file}")
 
 
-def run_filter(dataset, model_name, turn_len_limit, conv_turn_limit, output_file, resume,
+def run_filter(dataset, id_column, model_name, turn_len_limit, conv_turn_limit, output_file, resume,
                data_limit=None, batch_size=None, conversation_column="conversation"):
     """Keep only conversations about romantic relationship issues and write them to output_file (JSONL)."""
 
@@ -272,7 +273,7 @@ def run_filter(dataset, model_name, turn_len_limit, conv_turn_limit, output_file
         conv_turn_limit = CONV_TURN_LIMIT
 
     key = "RelationshipIssuesRelated"
-    system_prompt = f"""You are a helpful conversation analysis system. Your task is to determine whether a conversation involves someone discussing issues in their romantic relationship. Some examples of romantic relationship issues are: disagreements, conflicts, arguments, infidelity, jealousy, control, and communication problems. The user may be asking for advice, venting, or looking to understand their feelings or their partner's behaviour. Flag the conversation if it is related to romantic relationship issues and provide a brief reason for your decision. Respond with a single valid JSON object and nothing else. No markdown, no code fences, no explanation before or after. The JSON must have exactly these keys:
+    system_prompt = f"""You are a helpful conversation analysis system. Your task is to determine whether a conversation involves the user discussing issues in their romantic relationship. Some examples of romantic relationship issues are: disagreements, conflicts, arguments, infidelity, jealousy, control, and communication problems. The user may be asking for advice, venting, or looking to understand their feelings or their partner's behaviour. Flag the conversation if it is related to romantic relationship issues and provide a brief reason for your decision. Respond with a single valid JSON object and nothing else. No markdown, no code fences, no explanation before or after. The JSON must have exactly these keys:
         {{
         "{key}": <boolean>,
         "Reasoning": <string, max 2 sentences>
@@ -288,6 +289,7 @@ def run_filter(dataset, model_name, turn_len_limit, conv_turn_limit, output_file
     try:
         runner = EvaluationRunner(model_name=model_name, key=key)
         print(f"Using model {model_name} on device {runner.device}.")
+        dataset = dataset.select_columns([id_column, conversation_column])  # keep only the conversation column to save memory
         runner.label_and_filter(
             dataset=dataset, system_prompt=system_prompt, turn_len_limit=turn_len_limit,
             conv_turn_limit=conv_turn_limit, output_file=output_file, resume=resume,
