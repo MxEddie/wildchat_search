@@ -6,6 +6,7 @@ import argparse
 import torch
 import logging
 import sys, os
+
 import json
 import yaml
 from filter import run_filter
@@ -42,7 +43,7 @@ def _common_args(parser):
 
 def _search_args(parser):
     g = parser.add_argument_group("Search arguments", "Arguments for searching dataset(s) for relevant conversations.")
-    g.add_argument("--template-set",help="which template set to use for searching",choices=["AIPV_TEMPLATES", "BROAD_TEMPLATES", "TEST_TEMPLATES"],default="AIPV_TEMPLATES")
+    g.add_argument("--template-set",help="which template set to use for searching",choices=["AIPV_TEMPLATES", "BROAD_TEMPLATES", "TEST_TEMPLATES"],default="BROAD_TEMPLATES")
     g.add_argument("--validate-regex",help="whether to test regex compilation for all templates before searching",action="store_true")
     g.add_argument("--country", help="whether the search should be contained to a particular country",type=str, default=None)
     g.add_argument("--data-limit",help="maximum number of instances you want to take", type=int, default=None)
@@ -55,12 +56,13 @@ def _search_args(parser):
 def _filter_args(parser):
     g = parser.add_argument_group("Filter arguments", "Arguments for filtering matched conversations for relevancy.")
     g.add_argument("--filter-output-file", help="path to output file for filtered conversations", default=None) # Handling default elsewhere as it depends on dataset name 
-    g.add_argument("--filter-model", help="Huggingface model to use for filtering", type=str, default="Qwen/Qwen3-0.6B")
+    g.add_argument("--filter-model", help="Huggingface model to use for filtering", type=str, default="Qwen/Qwen3-1.7B")
     g.add_argument("--filter-data-limit", help="maximum number of matched conversations you want to take for filtering", type=int, default=None)
-    g.add_argument("--filter-turn-len-limit", help="maximum length of a single turn in the conversation for filtering. Turns truncated to reduce memory load during prompting.", type=int, default=100)
-    g.add_argument("--filter-conv-turn-limit", help="maximum length of a conversation for filtering in turns, if exceeded remaining turns will be truncated", type=int, default=None)
+    g.add_argument("--filter-turn-len-limit", help="maximum length of a single turn in the conversation for filtering. Turns truncated to reduce memory load during prompting.", type=int, default=None) ## handle default as global variable in filter.py
+    g.add_argument("--filter-conv-turn-limit", help="maximum length of a conversation for filtering in turns, if exceeded remaining turns will be truncated", type=int, default=None) ## handle default as global variable in filter.py
     g.add_argument("--resume-filter", help="whether to resume filtering from an existing output file", action="store_true")
     g.add_argument("--no-search", help="skip the search step and run filtering directly on the named dataset", action="store_true")
+    g.add_argument("--filter-batch-size", help="batch size for filtering", type=int, default=None) ## handle default as global variable in filter.py
 
 
 def parse_args():
@@ -136,11 +138,10 @@ def main():
     else:
         args.output_dir = "./"  # Default to current directory if no output directory is specified
     search_output_file_path = os.path.join(args.output_dir, args.search_output_file if args.search_output_file else f"matched_{args.dataset}.json")
-    filter_output_file_path = os.path.join(args.output_dir, args.filter_output_file if args.filter_output_file else f"filtered_{args.dataset}.json")
     
 
     ## Search the dataset for matching conversations and save to a JSON file, or load from an existing JSON file
-    if not args.no_search and "search" in args.steps:
+    if not args.no_search:
         if "search" in args.steps:
             logger.info("Searching dataset for matching conversations")
             try:
@@ -176,7 +177,23 @@ def main():
         ## Turn the matched conversations into a Huggingface dataset for filtering
         def gen_dataset(keep_dict):
             for conv_id, info in keep_dict.items():
-                yield {"conversation_id": conv_id, "conversation": info["conversation"], "matches": {label: info.get(label, False) for label in template_info["templates"].keys()}}
+                print(info)
+                yield {"conversation_id": conv_id, "conversation": info["Conversation"], "matches": {label: info.get(label, False) for label in template_info["templates"].keys()}}
+        ## crop length of all individual turns to handle issue of run on input
+        def crop_conversation(conversation, turn_len_limit=8000):
+            cropped_conversation = []
+            for turn in conversation:
+                if len(turn) > turn_len_limit:
+                    cropped_turn = turn[:turn_len_limit]
+                    cropped_conversation.append(cropped_turn)
+                else:
+                    cropped_conversation.append(turn)
+            return cropped_conversation
+
+        def gen_dataset(keep_dict):
+            for conv_id, info in keep_dict.items():
+                cropped_conv = crop_conversation(info["Conversation"], 1000)
+                yield {"conversation_id": conv_id, "conversation": cropped_conv, "matches": {label: info.get(label, False) for label in template_info["templates"].keys()}}
         dataset = Dataset.from_generator(gen_dataset, gen_kwargs={"keep_dict": keep_dict})
     
     else:
@@ -188,14 +205,26 @@ def main():
 
     ## Filter matched conversations (as a hugginface data set) using an LLM for relevancy and save to a JSON file
     if "filter" in args.steps:
+        if args.output_dir:
+            if not os.path.exists(args.output_dir):
+                os.makedirs(args.output_dir)
+                logger.info(f"Created output directory: {args.output_dir}")
+        else:
+            logger.info("No output directory specified, using current directory for filtered output.")
+            args.output_dir = "./"  # Default to current directory if no output directory is specified
+        if args.filter_output_file:
+            filter_output_file_path = os.path.join(args.output_dir, args.filter_output_file)
+        else:
+            filter_output_file_path = os.path.join(args.output_dir, f"filtered_{args.dataset}.json")
         logger.info("Filtering matched conversations for relevancy using an LLM")
         try:
-           run_filter(dataset, args.filter_model, turn_len_limit=500, conv_turn_limit=4,
-           output_file="ipv.jsonl", resume=True, data_limit=100,
-           batch_size=4, id_column="conversation_hash")
+           run_filter(dataset=dataset, model_name=args.filter_model, turn_len_limit=args.filter_turn_len_limit, conv_turn_limit=args.filter_conv_turn_limit,output_file=filter_output_file_path, resume=args.resume_filter, data_limit=args.filter_data_limit, batch_size=args.filter_batch_size, conversation_column="conversation")
         except ValueError as e:
             logger.error(f"Filtering failed: {e}")
             print(f"Filtering failed: {e}")
+
+    dataset = load_dataset("allenai/wildchat-4.8m-full", split="train", streaming=True)
+        
 
 
 if __name__ == "__main__":
